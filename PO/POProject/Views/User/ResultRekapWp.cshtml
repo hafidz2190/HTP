@@ -1,0 +1,167 @@
+﻿
+@{
+    ViewBag.Title = "Hasil Perekaman";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@section styles
+{
+    <link rel="stylesheet" href="~/Content/jtable240/themes/lightcolor/blue/jtable.min.css" />
+}
+<div class="page-header">
+    <h1>
+        Data Perekaman
+        <small>
+            <i class="ace-icon fa fa-angle-double-right"></i>
+            overview &amp; stats
+        </small>
+    </h1>
+</div><!-- /.page-header -->
+
+<div class="col-xs-12">
+    <!-- PAGE CONTENT BEGINS -->
+    <div class="alert alert-block alert-success">
+        <button type="button" class="close" data-dismiss="alert">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+
+        <i class="ace-icon fa fa-check green"></i>
+
+        <strong class="green">
+            Dashboard Pajak Online
+            <small>(v1.0)</small>
+        </strong>,
+        Laman ini memuat data perekaman
+    </div>
+
+
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="page-header">
+            </div><!-- /.page-header -->
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="progress" width="25">
+                        <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+                            <h5 class="modal-title" id="myModalLabel"><p id="demo"></p>%</h5>
+                        </div>
+                    </div>
+                    <!-- PAGE CONTENT BEGINS -->
+                    <div id="TableResultTransactionContainer"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts{
+    <script type="text/javascript" src="~/Content/jtable240/jquery.jtable.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            //setInterval(loadTable, 20000);
+            var d = new Date();
+            var month = d.getMonth() + 1;
+            var day = d.getDate();
+            var output = (('' + day).length > 2 ? '0' : '') + day + '/' +
+                (('' + month).length > 2 ? '0' : '') + month + '/' +
+            d.getFullYear();
+
+            $('#TableResultTransactionContainer').jtable({
+                title: 'Hasil Rekap Transaksi sampai dengan ' + output,
+                paging: true, //Enable paging
+                sorting: true, //Enable sorting
+                defaultSorting: 'Name ASC',
+                actions: {
+                    listAction: '/User/GetDataRekapTransaction'
+                },
+                fields: {
+                    Detail: {
+                        title: 'Detail',
+                        width: '5%',
+                        sorting: false,
+                        edit: false,
+                        create: false,
+                        listClass: 'center',
+                        display: function (transData) {
+                            //Create an image that will be used to open child table
+
+                            var $img = $('<img height="42" width="42" src="/Content/images/detail.png" title="Detail Transactions" />');
+                            //Open child table when user clicks the image
+                            $img.click(function () {
+                                $('#TableResultTransactionContainer').jtable('openChildTable',
+                                    $img.closest('tr'),
+                                    {
+                                        title: transData.record.Jenis_Pajak + ' - Transaction',
+                                        paging: true,
+                                        actions: {
+                                            listAction: '/User/TransactionDetailRekapList?month=' + transData.record.MasaPajak + '&year=' + transData.record.Tahun
+                                        },
+                                        @*toolbar: {
+                                            items: [{
+                                                tooltip: 'Download Excel',
+                                                text: 'Export to Excel',
+                                                click: function () {
+
+                                                    //use window.location.href for redirect to download action for download the file
+                                                    window.location.href = "@Url.RouteUrl(new
+                                                    { Controller = "User", Action = "ExportDetailToExcel" })/?date=" + transData.record.StrTanggal + "&nop=" + transData.record.Nop;
+
+                                                    //DownloadExcelDetail(transData.record.StrTanggal, transData.record.Nop);
+                                                    }
+                                            }]
+                                        },*@
+                                        fields: {
+                                            Record_Data: {
+                                                title: 'Data',
+                                                display: function (e) {
+                                                    if (transData.record.Is_Adjusment) {
+                                                        return 'Already Adjust'
+                                                    } else {
+                                                        return e.record.Record_Data;
+                                                    }
+                                                }
+                                            }
+                                        },
+                                    }, function (data) { //opened handler
+                                        data.childTable.jtable('load');
+                                    });
+                            });
+                            //Return image to show on the person row
+                            return $img;
+                        }
+                    },
+                    MasaPajak: {
+                        title: 'Bulan'
+                    },
+                    Tahun: {
+                        title: 'Tahun'
+                    },
+                    Jenis_Pajak: {
+                        title: 'Jenis Pajak'
+                    },
+                    StrTotalTransaksi: {
+                        title: 'Total Transaksi'
+                    }
+                }
+            })
+            $('#TableResultTransactionContainer').jtable('load');
+        });
+        var myVar = setInterval(function () { myTimer() }, 20);
+        var count = 0;
+        function myTimer() {
+            if (count < 100) {
+                $('.progress').css('width', count + "%");
+                count += 0.05;
+                document.getElementById("demo").innerHTML = Math.round(count) + "%";
+                // code to do when loading
+            }
+            else if (count > 99) {
+                // code to do after loading
+                count = 0;
+                $('#TableResultTransactionContainer').jtable('load');
+            }
+        }
+        //function loadTable() {
+
+
+        //};
+    </script>
+}

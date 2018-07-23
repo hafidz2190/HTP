@@ -1,0 +1,928 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using System.Threading.Tasks;
+using log4net;
+using Nancy;
+using Nancy.Extensions;
+using Newtonsoft.Json;
+using POProject.BusinessLogic;
+using POProject.BusinessLogic.Entity;
+using System.Globalization;
+using Newtonsoft.Json.Converters;
+using System.Text.RegularExpressions;
+
+namespace POProject.API.Module
+{
+    public class DevModule : NancyModule
+    {
+        private static readonly ILog log = LogManager.GetLogger(typeof(DevModule));
+        public DevModule()
+        {
+            Get["/testConnection"] = parameter =>
+            {
+                var jsonBody = string.Empty;
+                try
+                {
+                    List<ExceptionPort> listPort = new List<ExceptionPort>();
+                    listPort = SettingClientBusiness.RetrievePortException();
+                    log.Debug("Get list port");
+                    jsonBody = JsonConvert.SerializeObject(listPort);
+                    log.Debug("Connection Success");
+                    return Response.AsJson(new { value = "OK", body = jsonBody });
+                }
+                catch (Exception ex)
+                {
+                    return Response.AsJson(new { value = "Error : " + ex.Message, body = jsonBody });
+                }
+
+
+            };
+
+            Get["/dev/getAllUser"] = parameter =>
+            {
+                log.Debug("Start:/dev/getAllUser");
+                List<string> lstUsr = new List<string>();
+                try
+                {
+                    lstUsr = UserSettingColumnBusiness.RetrieveAllUser();
+                    log.Debug("Get User Success");
+                }
+                catch (Exception ex)
+                {
+                    //log.Debug( "Get User Failed : " + ex.Message );
+                    log.Fatal("Error:/dev/getAllUser", ex);
+                    return Response.AsJson(new { code = HttpStatusCode.NotFound, message = "Data Not Found", body = string.Empty });
+                }
+
+                var jsonBody = JsonConvert.SerializeObject(lstUsr);
+                return Response.AsJson(new { code = HttpStatusCode.OK, message = "Ok", body = jsonBody });
+            };
+
+            Get["/dev/getSerialKeyIsExist"] = parameter =>
+            {
+                log.Debug("Start:/dev/getSerialKeyIsExist");
+                try
+                {
+                    string body = Nancy.IO.RequestStream.FromStream(Request.Body).AsString();
+                    bool isFound = UserSettingColumnBusiness.IsSerialFound(body);
+                    if (isFound)
+                    {
+                        log.Debug("Serial is found");
+                        return Response.AsJson(new { code = HttpStatusCode.OK, message = "Found", body = "True" });
+                    }
+                    else
+                    {
+                        log.Debug("Serial not found");
+                        return Response.AsJson(new { code = HttpStatusCode.OK, message = "Not", body = "False" });
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    //log.Debug( "Get User Failed : " + ex.Message );
+                    log.Fatal("Error:/dev/getSerialKeyIsExist", ex);
+                    return Response.AsJson(new { code = HttpStatusCode.NotFound, message = "Data Not Found", body = string.Empty });
+                }
+
+
+            };
+
+            Get["/dev/GetUrlApi"] = parameter =>
+            {
+                log.Debug("Start:/dev/GetUrlApi");
+                string urlApi = string.Empty;
+                urlApi = UserActivityBusiness.GetUrlApi();
+                try
+                {
+                    var jsonBody = JsonConvert.SerializeObject(urlApi);
+                    return Response.AsJson(new { code = HttpStatusCode.OK, message = "Ok", body = jsonBody });
+                }
+                catch (Exception ex)
+                {
+                    return Response.AsJson(new { code = HttpStatusCode.InternalServerError, message = $"Error, {ex.Message}", body = string.Empty });
+                }
+
+            };
+
+            Get["/dev/GetTarifPajak"] = parameter =>
+            {
+                log.Debug("Start:/dev/GetTarifPajak");
+                List<JenisPajak> lstPajak = new List<JenisPajak>();
+                try
+                {
+                    //Get All Tarif Pajak
+                    lstPajak = UserSettingColumnBusiness.RetrieveTarifAll();
+                    log.Debug("Get tarif pajak success");
+                }
+                catch (Exception ex)
+                {
+                    log.Fatal("Error:/dev/GetTarifPajak", ex);
+                    return Response.AsJson(new { code = HttpStatusCode.NotFound, message = "Data Not Found", body = string.Empty });
+                }
+
+                var jsonBody = JsonConvert.SerializeObject(lstPajak);
+                return Response.AsJson(new { code = HttpStatusCode.OK, message = "OK", body = jsonBody });
+            };
+
+            Post["/dev/postLastErrorDate"] = parameter =>
+            {
+                try
+                {
+                    log.Info("Start : /dev/postLastErrorDate");
+                    string ip = Request.UserHostAddress;
+                    string body = Nancy.IO.RequestStream.FromStream(Request.Body).AsString();
+                    log.Info("Deserialize object from json body");
+                    var setting = JsonConvert.DeserializeObject<string>(body);
+                    //Get Last Error Date By status_error
+                    LastErrorResponse resp = new LastErrorResponse();
+                    resp.TanggalError = DateTime.Now.Date;
+
+                    resp.TanggalError = UserActivityBusiness.GetLastErrorDate(setting);
+
+                    var jsonBody = JsonConvert.SerializeObject(resp);
+                    log.Info("End : /dev/postLastErrorDate");
+                    return Response.AsJson(new { code = HttpStatusCode.OK, body = jsonBody });
+                }
+                catch (Exception ex)
+                {
+                    log.Fatal("Error : /dev/postLastErrorDate", ex);
+                    return Response.AsJson(new { code = HttpStatusCode.InternalServerError, message = $"Error, {ex.Message}" });
+                    throw;
+                }
+            };
+
+            Post["/dev/postSettingClient"] = parameter =>
+            {
+                try
+                {
+                    log.Info("Start : /dev/postSettingClient");
+                    log.Info($"incoming request from IP:{this.Request.UserHostAddress}");
+                    string body = Nancy.IO.RequestStream.FromStream(Request.Body).AsString();
+                    log.Info("Deserialize object from json body");
+                    JsonSetting setting = JsonConvert.DeserializeObject<JsonSetting>(body);
+
+                    #region Inserting Data Setting Client
+                    log.Info("Inserting data setting client");
+                    string username = string.Empty;
+                    Parallel.ForEach(setting.list_user, item =>
+                    {
+                        SettingClientBusiness.InsertUserClient(item.userName, item.idMachine, item.guid, item.phone, item.mail, item.port);
+                        username = item.userName;
+                    });
+
+                    Parallel.ForEach(setting.list_nop, item =>
+                    {
+                        SettingClientBusiness.InsertUserNop(username, item.nop, item.jenisPajak);
+                    });
+
+                    Parallel.ForEach(setting.settings, item =>
+                    {
+                        SettingClientBusiness.InsertUserSettingColumn(username, item.nop, item.column_name, item.column_text);
+                    });
+                    #endregion
+
+                    //insert xmlcontent
+                    SettingClientBusiness.InsertXmlFile(username, "setUpload.xml", setting.xml_content, setting.jenFile, setting.separator);
+
+                    log.Info("End : /dev/postSettingClient");
+                    return Response.AsJson(new { code = HttpStatusCode.OK });
+                }
+                catch (System.Exception ex)
+                {
+                    log.Fatal("Error : /dev/postSettingClient", ex);
+                    return Response.AsJson(new { code = HttpStatusCode.InternalServerError, message = $"Error, {ex.Message}" });
+                    throw;
+                }
+            };
+
+            Post["/dev/postSettingClientWithParam"] = parameter =>
+            {
+                try
+                {
+                    log.Info("Start : /dev/postSettingClientWithParam");
+                    log.Info($"incoming request from IP:{this.Request.UserHostAddress}");
+                    var body = Nancy.IO.RequestStream.FromStream(Request.Body).AsString();
+                    log.Info("Deserialize object from json body");
+                    User user = JsonConvert.DeserializeObject<User>(body);
+
+                    //Retrieve Data User Setting
+                    if (user != null)
+                    {
+                        log.Info("Checking user exist");
+                        UserClient userClient = SettingClientBusiness.RetrieveUserClient(user.userName, user.idMachine, user.guid).FirstOrDefault();
+                        if (userClient != null)
+                        {
+                            log.Info("Retrieve data setting client from database");
+                            List<UserSettingColumn> listSettingColumn = UserSettingColumnBusiness.RetrieveSettingColumnByUsername(userClient.Username);
+                            log.Info("Serialize data to json");
+                            var jsonBody = JsonConvert.SerializeObject(listSettingColumn);
+                            log.Info("End : /dev/postSettingClientWithParam");
+                            return Response.AsJson(new { code = HttpStatusCode.OK, message = "Success", body = jsonBody });
+                        }
+                        else
+                        {
+                            log.Info("End : /dev/postSettingClientWithParam");
+                            return Response.AsJson(new { code = HttpStatusCode.NotFound, message = "Data Not Found", body = string.Empty });
+                        }
+                    }
+                    else
+                    {
+                        log.Info("End : /dev/postSettingClientWithParam");
+                        return Response.AsJson(new { code = HttpStatusCode.Unauthorized, message = "Failed", body = string.Empty });
+                    }
+                }
+                catch (Exception ex)
+                {
+                    log.Fatal("Error : /dev/postSettingClientWithParam", ex);
+                    return Response.AsJson(new { code = HttpStatusCode.BadRequest, message = $"Error, {ex.Message}", body = string.Empty });
+                }
+            };
+
+            Post["/dev/postTransactionClient"] = parameter =>
+            {
+                try
+                {
+                    log.Info("Start : /dev/postTransactionClient");
+                    string ip = this.Request.UserHostAddress;
+                    log.Info($"incoming request from IP:{ip}");
+                    string body = Nancy.IO.RequestStream.FromStream(Request.Body).AsString();
+                    JsonData jsonData = JsonConvert.DeserializeObject<JsonData>(body);
+
+                    string username = string.Empty;
+                    string CultureInfos = string.Empty;
+                    username = jsonData.datauser.FirstOrDefault().username;
+
+                    string bulan = jsonData.masapajak.FirstOrDefault().bulan;
+                    string tahun = jsonData.masapajak.FirstOrDefault().tahun;
+                    CultureInfos = jsonData.items.CultureInfos;
+                    log.Info("generating file json to xml");
+
+                    DataTable dtTransaksi = new DataTable();
+                    DataTable dtLampiran = new DataTable();
+
+                    if (jsonData.items.dtLampiran != null && jsonData.items.dtLampiran.Rows.Count > 0)
+                        dtTransaksi = jsonData.items.dtPajak;
+                    else
+                    {
+                        log.Info("Data tidak ditemukan ............");
+                        return Response.AsJson(new { code = HttpStatusCode.NotFound, message = $"Error, {"Data tidak ditemukan."}" });
+                    }
+
+                    if (jsonData.items.dtLampiran != null && jsonData.items.dtLampiran.Rows.Count > 0)
+                        dtLampiran = jsonData.items.dtLampiran;
+                    else
+                        dtLampiran = dtTransaksi.Copy();
+
+                    string nop = string.Empty;
+                    bool isFromDatabase = false;
+                    DataColumnCollection col = dtLampiran.Columns;
+                    List<string> lstDistNopLampiran = null;
+                    if (col.Contains("NOP_LAMPIRAN"))
+                    {
+                        lstDistNopLampiran = dtLampiran.AsEnumerable().Select(r => r.Field<string>("NOP_LAMPIRAN")).Distinct().ToList();
+                        isFromDatabase = true;
+                        dtLampiran.Columns["NOP"].ColumnName = "NOP_ALIAS";
+                        dtLampiran.Columns["NOP_LAMPIRAN"].ColumnName = "NOP";
+                    }
+                    else
+                        lstDistNopLampiran = dtLampiran.AsEnumerable().Select(r => r.Field<string>("NOP")).Distinct().ToList();
+
+                    if (lstDistNopLampiran == null || lstDistNopLampiran.Count <= 0)
+                    {
+                        log.Info("List Nop tidak ditemukan ............");
+                        return Response.AsJson(new { code = HttpStatusCode.NotFound, message = $"Error, List Nop tidak ditemukan." });
+                    }
+
+
+                    List<string> lstNopBlokir = new List<string>();
+                    foreach (var itemNopLampiran in lstDistNopLampiran)
+                    {
+                        nop = itemNopLampiran;
+                        string queryPajak = string.Empty;
+
+                        //Validate Query
+                        if (isFromDatabase)
+                        {
+                            List<BusinessLogic.queryData> queryLst = UserSettingColumnBusiness.RetrieveQueryPajak(username, nop);
+                            if (queryLst != null && queryLst.Count > 0)
+                            {
+                                bool isQueryValid = true;
+                                string queryPajakFromXml = Regex.Replace(jsonData.items.lstQuery.FirstOrDefault().queryPajak, @"\s+", string.Empty);
+                                string queryPajakFromDB = Regex.Replace(queryLst.FirstOrDefault().queryPajak, @"\s+", string.Empty);
+                                queryPajak = jsonData.items.lstQuery.FirstOrDefault().queryPajak;
+                                string queryLampiranFromXml = Regex.Replace(jsonData.items.lstQuery.FirstOrDefault().queryLampiran, @"\s+", string.Empty);
+                                string queryLampiranFromDB = Regex.Replace(queryLst.FirstOrDefault().queryLampiran, @"\s+", string.Empty);
+
+                                if (!string.Equals(queryPajakFromDB, queryPajakFromXml, StringComparison.OrdinalIgnoreCase))
+                                {
+                                    isQueryValid = false;
+                                }
+
+                                if (!string.Equals(queryLampiranFromXml, queryLampiranFromDB, StringComparison.OrdinalIgnoreCase))
+                                {
+                                    isQueryValid = false;
+                                }
+
+                                if (!isQueryValid)
+                                {
+                                    //insert tanggal_error into user_temp_error
+                                    DateTime dtmlastTime = dtTransaksi.AsEnumerable().Select(x => x.Field<DateTime>("TGL_TRANSAKSI")).FirstOrDefault();
+                                    UserActivityBusiness.InsertUserActivity(username, ip, DateTime.Now, true, "Query tidak sesuai");
+                                    log.Info("Query tidak sesuai, mohon periksa kembali. ............");
+                                    return Response.AsJson(new { code = HttpStatusCode.InternalServerError, message = $"Error, Query tidak sesuai, mohon periksa kembali." });
+                                }
+                            }
+                            else
+                            {
+                                log.Info("Query pada username dan nop tersebut tidak ditemukan ............");
+                                return Response.AsJson(new { code = HttpStatusCode.NotFound, message = $"Error, Query pada username dan nop tersebut tidak ditemukan." });
+                            }
+                        }
+
+                        List<Transaction> lstTransaksi = new List<Transaction>();
+                        //Get nama kolom tanggal transaksi 
+                        List<UserSettingColumn> lstKolomName = new List<UserSettingColumn>();
+                        string namaKolomTanggal = string.Empty;
+                        if (!isFromDatabase)
+                        {
+                            lstKolomName = UserSettingColumnBusiness.RetrieveColumnByUserNop(username, nop);
+                        }
+                        else
+                        {
+                            DataColumnCollection colTrans = dtTransaksi.Columns;
+                            foreach (var itemKolom in colTrans)
+                            {
+                                UserSettingColumn userKolom = new UserSettingColumn();
+                                userKolom.Username = username;
+                                userKolom.Nop = nop;
+                                userKolom.Column_Name = itemKolom.ToString();
+                                userKolom.Column_Text = itemKolom.ToString();
+                                lstKolomName.Add(userKolom);
+                            }
+
+
+                        }
+
+                        namaKolomTanggal = lstKolomName.Where(m => m.Column_Name.ToUpper().Contains("TGL_TRANSAKSI")).Select(m => m.Column_Text.ToUpper()).FirstOrDefault();
+
+                        List<string> namaKolomNilai = lstKolomName.Where(m => m.Column_Name.Contains("PAJAK")).Select(m => m.Column_Text).ToList();
+                        DataView dv = dtTransaksi.DefaultView;
+                        dv.RowFilter = "NOP=" + nop;
+                        dv.Sort = namaKolomTanggal;
+                        DataTable dtSortTransaction = dv.ToTable();
+                        DateTime tglOld = new DateTime();
+                        double nilaiOld = 0;
+
+                        bool isNopBlokir = false;
+                        DataRow last = dtSortTransaction.Rows[dtSortTransaction.Rows.Count - 1];
+                        foreach (DataRow dRow in dtSortTransaction.Rows)
+                        {
+                            DateTime tanggal = dRow[namaKolomTanggal].AsDateTime();
+                            int mp = tanggal.Month;
+                            int thn = tanggal.Year;
+                            //check sptpd is generate
+                            if (SPTPDDetailBusiness.isSptpdDetailByNop(dRow["NOP"].ToString(), mp, thn))
+                            {
+                                lstNopBlokir.Add(dRow["NOP"].ToString());
+                                isNopBlokir = true;
+                                break;
+                            }
+
+                            double nilaiPajak = 0;
+
+                            for (int iNilai = 0; iNilai < namaKolomNilai.Count; iNilai++)
+                            {
+                                nilaiPajak += dRow[namaKolomNilai[iNilai]].AsDouble();
+                            }
+
+                            if (tglOld.Year == 1)
+                            {
+                                tglOld = tanggal;
+                                nilaiOld = nilaiPajak;
+                                if (dRow == last)
+                                {
+                                    Transaction itemTrans = new Transaction();
+                                    itemTrans = new Transaction();
+                                    itemTrans.tanggal = tglOld;
+                                    itemTrans.total = nilaiOld;
+                                    lstTransaksi.Add(itemTrans);
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                if (tglOld.Date == tanggal.Date)
+                                {
+                                    if (dRow == last)
+                                    {
+                                        nilaiOld += nilaiPajak;
+                                        Transaction itemTrans = new Transaction();
+                                        itemTrans = new Transaction();
+                                        itemTrans.tanggal = tglOld;
+                                        itemTrans.total = nilaiOld;
+                                        lstTransaksi.Add(itemTrans);
+                                        break;
+                                    }
+
+                                    nilaiOld += nilaiPajak;
+                                }
+                                else
+                                {
+                                    Transaction itemTrans = new Transaction();
+                                    itemTrans.tanggal = tglOld;
+                                    itemTrans.total = nilaiOld;
+                                    lstTransaksi.Add(itemTrans);
+
+                                    tglOld = tanggal.Date;
+                                    nilaiOld = nilaiPajak;
+
+                                    if (dRow == last)
+                                    {
+                                        itemTrans = new Transaction();
+                                        itemTrans.tanggal = tglOld;
+                                        itemTrans.total = nilaiOld;
+                                        lstTransaksi.Add(itemTrans);
+                                    }
+                                }
+                            }
+                        }
+
+                        if (isNopBlokir)
+                            continue;
+
+                        log.Info("inserting data to user transaction");
+                        //cek transaction isExist
+                        IEnumerable<UserTransaction> lstTransExist = new List<UserTransaction>();
+                        lstTransExist = UserTransactionBusiness.RetrieveUserTransactionByMonth(username, lstTransaksi.FirstOrDefault().tanggal.Month,
+                            lstTransaksi.FirstOrDefault().tanggal.Year);
+
+                        //insert into user_transaction
+                        foreach (var item in lstTransaksi)
+                        {
+                            bool isExist = lstTransExist.Where(m => m.Tanggal.Date == item.tanggal.Date && m.Nop == nop).ToList().Count > 0;
+                            try
+                            {
+                                if (isExist)
+                                {
+                                    log.Info("update data from user " + username);
+                                    UserTransactionBusiness.UpdatePajakUserTransaction(username, nop, item.tanggal, item.total);
+                                }
+                                else
+                                {
+                                    log.Info("insert data from user " + username);
+                                    UserTransactionBusiness.InsertUserTransaction(username, item.tanggal, item.total, ip, string.Empty, false, nop);
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                log.Info("insert or update error : " + ex.Message);
+                            }
+                        }
+
+                        log.Info("inserting data to user transaction detail");
+                        //insert into user_transaction_detail
+                        string dir = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "transaction.xml");
+
+                        //Replace nama kolom untuk no_invoice dan tgl_transaksi
+                        if (!isFromDatabase)
+                        {
+                            List<UserSettingColumn> lstSetCol = SettingClientBusiness.RetrieveUserSettingColumn(username, nop);
+                            string noInvoice = lstSetCol.Where(x => x.Column_Name.ToUpper().Equals("NO_INVOICE")).Select(x => x.Column_Text.ToUpper()).FirstOrDefault();
+                            string tglTransaksi = lstSetCol.Where(x => x.Column_Name.ToUpper().Equals("TGL_TRANSAKSI")).Select(x => x.Column_Text.ToUpper()).FirstOrDefault();
+
+                            dtLampiran.Columns[noInvoice].ColumnName = "NO_INVOICE";
+                            dtLampiran.Columns[tglTransaksi].ColumnName = "TGL_TRANSAKSI";
+                        }
+
+
+                        string colTglName = "TGL_TRANSAKSI";
+
+                        //Pecah dan simpan sesuai tanggal transaksi
+                        #region Old Code
+                        //string[] arrSelect = queryPajak.ToUpper().Split(new string[] { "FROM" }, StringSplitOptions.None);
+                        //string[] arrSplit = arrSelect[0].Split(',');
+                        //string dbColDateName = string.Empty;
+                        //if (isFromDatabase)
+                        //{
+                        //    foreach (string item in arrSplit)
+                        //    {
+                        //        if (item.Contains("TGL_TRANSAKSI"))
+                        //        {
+                        //            dbColDateName = item;
+                        //            break;
+                        //        }
+                        //    }
+                        //}
+                        //else
+                        //{
+                        //    dbColDateName = namaKolomTanggal;
+                        //}
+
+
+                        //string[] arrTglName = dbColDateName.Replace("SELECT ", string.Empty).Split(' ');
+                        //string colTglName = string.Empty;
+                        //if (arrTglName.Count() > 1)
+                        //    colTglName = arrTglName[arrTglName.Count() - 2];
+                        //else
+                        //    colTglName = arrTglName[0];
+
+                        //if (string.IsNullOrEmpty(colTglName))
+                        //{
+                        //    if (string.IsNullOrEmpty(queryPajak))
+                        //        colTglName = "TGL_TRANSAKSI";
+                        //}
+                        #endregion
+
+                        //DataView dvTrans = new DataView(dtLampiran);
+                        //dvTrans.RowFilter = $"NOP={nop}";
+                        //DataTable dtDistDate = dvTrans.ToTable(true, colTglName);
+
+                        DataTable dtTransByNop = dtLampiran.AsEnumerable().Where(m => m.Field<string>("NOP").Equals(nop)).CopyToDataTable();
+                        DataTable dtDistDate = new DataTable();
+                        dtDistDate.Columns.Add(colTglName, typeof(DateTime));
+
+                        if (dtTransByNop.Columns[colTglName].DataType != typeof(DateTime))
+                        {
+                            DataTable copyTransTable = dtTransByNop.Clone();
+                            copyTransTable.Columns[colTglName].DataType = typeof(DateTime);
+
+                            foreach (DataRow item in dtTransByNop.Rows)
+                            {
+                                DataRow nRowTransTable = copyTransTable.NewRow();
+                                nRowTransTable.ItemArray = item.ItemArray;
+                                copyTransTable.Rows.Add(nRowTransTable);
+                            }
+
+                            dtTransByNop = copyTransTable;
+                        }
+
+                        //New Code
+                        DateTime oldDate = DateTime.MinValue;
+                        foreach (DataRow item in dtTransByNop.Rows)
+                        {
+                            DateTime newDate = Convert.ToDateTime(item["TGL_TRANSAKSI"]).Date;
+                            if (oldDate.Date != newDate)
+                            {
+                                DataRow newRow = dtDistDate.NewRow();
+                                newRow[colTglName] = newDate;
+                                dtDistDate.Rows.Add(newRow);
+                                oldDate = newDate;
+                            }
+                        }
+                        ///// End New Code
+
+                        foreach (DataRow dRow in dtDistDate.Rows)
+                        {
+                            DataSet ds = new DataSet();
+                            DateTime tglTrans = DateTime.MinValue;
+                            try
+                            {
+                                tglTrans = Convert.ToDateTime(dRow[colTglName], new CultureInfo(CultureInfos));
+                                //tglTrans = Convert.ToDateTime(dRow[colTglName].ToString(), new CultureInfo("en-US"));
+                                //if (tglTrans == DateTime.MinValue)
+                                //{
+                                //    tglTrans = Convert.ToDateTime(dRow[colTglName].ToString(), new CultureInfo("id-ID"));
+                                //}
+                            }
+                            catch (Exception ex)
+                            {
+                                log.Info("Date format error......" + ex.Message);
+                                //tglTrans = Convert.ToDateTime(dRow[colTglName].ToString(), new CultureInfo("id-ID"));
+                            }
+
+
+                            //DataView dvTrans = new DataView(dtTransByNop);
+                            DataView vw = dtTransByNop.AsDataView();
+                            //DateTime filterDate = new DateTime(tglTrans.Year, tglTrans.Month, tglTrans.Day);
+                            string startDate = tglTrans.ToString("MM/dd/yyyy 00:00:00", new CultureInfo("en-US"));
+                            string endDate = tglTrans.ToString("MM/dd/yyyy 23:59:59", new CultureInfo("en-US"));
+
+                            string filter = string.Format(colTglName + " >= #{0}# AND " + colTglName + "<=#{1}#",
+                               startDate, endDate);
+                            vw.RowFilter = filter;
+                            //if(vw.ToTable().Rows.Count <= 0)
+                            //{
+                            //    vw = dvTrans.ToTable().AsDataView();
+                            //    filter = string.Format(colTglName + " >= #{0}# AND " + colTglName + "<=#{1}#",
+                            //        startDate, endDate);
+                            //    vw.RowFilter = filter;
+                            //}
+                            ////ds.Tables.Add(dvTrans.ToTable());                            
+                            ds.Tables.Add(vw.ToTable());
+                            ds.WriteXml(dir);
+
+                            string xmlString = System.IO.File.ReadAllText(dir);
+                            string nopDetail = string.Empty;
+
+
+                            UserTransactionDetailBusiness.InsertUserTransactionDetail(username, dir, bulan.AsInt32(), tahun.AsInt32(), tglTrans, ip, xmlString, nop);
+                        }
+                    }
+
+                    log.Info("End : /dev/postTransactionClient");
+                    if (lstNopBlokir != null && lstNopBlokir.Count > 0)
+                    {
+                        string nopBlokir = string.Empty;
+                        foreach (var itemBlokir in lstNopBlokir)
+                        {
+                            nopBlokir += itemBlokir + ",";
+                        }
+
+                        nopBlokir = nopBlokir.Remove(nopBlokir.Length - 1);
+
+                        return Response.AsJson(new { code = HttpStatusCode.MethodNotAllowed, message = "nop (" + nopBlokir + ") pada masapajak tersebut, sudah tergenerate." });
+                    }
+                    else
+                        return Response.AsJson(new { code = HttpStatusCode.OK, message = "Transaksi berhasil tersimpan" });
+                }
+                catch (System.Exception ex)
+                {
+                    log.Fatal("Error: /dev/postTransactionClient", ex);
+                    return Response.AsJson(new { code = HttpStatusCode.InternalServerError, message = $"Error, {ex.Message}" });
+                    //throw;
+                }
+            };
+
+            Post["/dev/postUserActivity"] = parameter =>
+            {
+                try
+                {
+                    log.Info("Start : /dev/postUserActivity");
+                    string ip = this.Request.UserHostAddress;
+                    log.Info($"incoming request from IP:{ip}");
+                    string body = Nancy.IO.RequestStream.FromStream(Request.Body).AsString();
+
+                    log.Info("Deserializing Object ............");
+                    UserActivity userActivity = JsonConvert.DeserializeObject<UserActivity>(body);
+                    DateTime dateNow = DateTime.Now;
+
+
+                    DateTime tglClient = DateTime.MinValue;
+                    try
+                    {
+                        tglClient = Convert.ToDateTime(userActivity.ActivityDate, new CultureInfo(userActivity.CultureInfos));
+                        //tglClient = Convert.ToDateTime(userActivity.ActivityDate, new CultureInfo("en-US"));
+                        //if (tglClient == DateTime.MinValue)
+                        //{
+                        //    tglClient = Convert.ToDateTime(userActivity.ActivityDate, new CultureInfo("id-ID"));
+                        //}
+                    }
+                    catch (Exception ex)
+                    {
+                        log.Info("Date format error......" + ex.Message);
+                        //tglClient = Convert.ToDateTime(userActivity.ActivityDate, new CultureInfo(userActivity.CultureInfos));
+                        //tglClient = Convert.ToDateTime(userActivity.ActivityDate, new CultureInfo("id-ID"));
+                    }
+
+                    tglClient = Convert.ToDateTime(tglClient, new CultureInfo("en-US"));
+
+                    //if (tglClient.Date != dateNow.Date)
+                    //{
+                    //    log.Info($"Tanggal Client {userActivity.ActivityDate}");
+                    //    log.Info("Tanggal Client (" + tglClient.Date + ") != tanggal Server (" + dateNow + ")............");
+                    //}
+
+                    if (userActivity != null)
+                    {
+                        log.Info("Inserting user activity ............");
+                        bool status = false;
+                        if (string.Compare(userActivity.StatusError, "1") == 0)
+                        {
+                            status = true;
+                        }
+
+                        //if (userActivity.Keterangan.ToUpper().Equals("FORM OPEN"))
+                        //{
+                        //    UserActivityBusiness.InsertUserActivity(userActivity.Username, ip, dateNow, status, userActivity.Keterangan);
+                        //    var jsonBody = JsonConvert.SerializeObject(dateNow, Formatting.None, new IsoDateTimeConverter() { DateTimeFormat = "yyyy-MM-dd hh:mm:ss" });
+
+                        //    log.Info("End : /dev/postUserActivity");
+                        //    return Response.AsJson(new { code = HttpStatusCode.OK, message = "User Activity Berhasil tersimpan.", body = jsonBody });
+                        //}
+                        //else
+                        //{
+                        try
+                        {
+                            UserActivityBusiness.InsertUserActivity(userActivity.Username, userActivity.IPClient, dateNow, status, userActivity.Keterangan);
+                            var jsonBody = JsonConvert.SerializeObject(dateNow, Formatting.None, new IsoDateTimeConverter() { DateTimeFormat = "yyyy-MM-dd hh:mm:ss" });
+
+                            log.Info("End : /dev/postUserActivity");
+                            return Response.AsJson(new { code = HttpStatusCode.OK, message = "User Activity Berhasil tersimpan.", body = jsonBody });
+                        }
+                        catch (Exception ex)
+                        {
+                            log.Fatal("Error : /dev/postUserActivity", ex);
+                            return Response.AsJson(new { code = HttpStatusCode.InternalServerError, message = $"Error, {ex.Message}" });
+                        }
+
+                        //}
+
+                    }
+                    else
+                    {
+                        log.Info("End : /dev/postUserActivity");
+                        return Response.AsJson(new { code = HttpStatusCode.Unauthorized, message = "Failed while deserializing object, data not found", body = string.Empty });
+                    }
+
+                    log.Info("End : /dev/postUserActivity");
+                    return Response.AsJson(new { code = HttpStatusCode.OK, message = "User Activity Berhasil tersimpan.", body = string.Empty });
+                }
+                catch (Exception ex)
+                {
+                    log.Fatal("Error : /dev/postUserActivity", ex);
+                    return Response.AsJson(new { code = HttpStatusCode.InternalServerError, message = $"Error, {ex.Message}" });
+                }
+            };
+
+            Post["/dev/RetrieveCpuId"] = Parameter =>
+            {
+                try
+                {
+                    log.Info("Start : /dev/RetrieveCpuId");
+                    string username = string.Empty;
+                    string cpuId = string.Empty;
+                    string body = Nancy.IO.RequestStream.FromStream(Request.Body).AsString();
+
+                    log.Info("Deserializing Object ............");
+                    string[] arrStr = body.Split(',');
+
+                    if (arrStr.Count() > 0)
+                    {
+                        for (int iArr = 0; iArr < arrStr.Count(); iArr++)
+                        {
+                            username += "'" + arrStr[iArr] + "',";
+                        }
+
+                        username = username.Remove(username.Length - 1);
+                    }
+
+                    List<UserClient> lstUsr = SettingClientBusiness.RetrieveUserClient(username);
+                    if (lstUsr != null && lstUsr.Count > 0)
+                        cpuId = lstUsr.FirstOrDefault().Id_Machine;
+
+                    log.Info("End : /dev/RetrieveCpuId");
+                    return Response.AsJson(new { code = HttpStatusCode.OK, message = "OK", cpuId = cpuId });
+                }
+                catch (Exception ex)
+                {
+                    log.Info("End : /dev/RetrieveCpuId");
+                    return Response.AsJson(new { code = HttpStatusCode.FailedDependency, message = ex.Message, cpuId = "" });
+                }
+            };
+
+            Post["/dev/RetrieveJatuhTempo"] = parameter =>
+            {
+                try
+                {
+                    log.Info("Start : /dev/RetrieveJatuhTempo");
+                    string ip = this.Request.UserHostAddress;
+                    log.Info($"incoming request from IP:{ip}");
+                    string body = Nancy.IO.RequestStream.FromStream(Request.Body).AsString();
+
+                    log.Info("Deserializing Object ............");
+                    RequestDueDate dueDate = JsonConvert.DeserializeObject<RequestDueDate>(body);
+
+                    string tanggal = string.Empty;
+                    if (dueDate != null)
+                    {
+                        JatuhTempo jthTempo = JatuhTempoBusiness.RetrieveJatuhTempo(dueDate.masapajak.AsInt32(), dueDate.tahunpajak.AsInt32());
+                        if (jthTempo != null)
+                        {
+                            tanggal = jthTempo.Tgl_Jatuh_Tempo.ToString("dd/MM/yyyy");
+
+                            log.Info("End : /dev/RetrieveJatuhTempo");
+                            return Response.AsJson(new { code = HttpStatusCode.OK, tanggal = tanggal });
+                        }
+                        else
+                        {
+                            log.Info("End : /dev/RetrieveJatuhTempo");
+                            return Response.AsJson(new { code = HttpStatusCode.ExpectationFailed });
+                        }
+                    }
+                    else
+                    {
+                        log.Info("End : /dev/RetrieveJatuhTempo");
+                        return Response.AsJson(new { code = HttpStatusCode.Unauthorized, message = "Failed while deserializing object, data not found", body = string.Empty });
+                    }
+                }
+                catch (Exception ex)
+                {
+                    log.Fatal("Error : /dev/RetrieveJatuhTempo", ex);
+                    return Response.AsJson(new { code = HttpStatusCode.InternalServerError, message = $"Error, {ex.Message}" });
+                }
+            };
+        }
+
+        class RequestDueDate
+        {
+            public string masapajak { get; set; }
+            public string tahunpajak { get; set; }
+            public string username { get; set; }
+        }
+
+        class ResponseDueDate
+        {
+            public string tanggal { get; set; }
+        }
+
+        class JsonSetting
+        {
+            public IEnumerable<User> list_user { get; set; }
+            public IEnumerable<Nop> list_nop { get; set; }
+            public IEnumerable<DBColSetting> settings { get; set; }
+            public string xml_content { get; set; }
+            public string jenFile { get; set; }
+            public string separator { get; set; }
+        }
+
+        class Nop
+        {
+            public string nop { get; set; }
+            public string jenisPajak { get; set; }
+        }
+
+        class DBColSetting
+        {
+            public string nop { get; set; }
+            public string column_name { get; set; }
+            public string column_text { get; set; }
+        }
+
+        class User
+        {
+            public string userName { get; set; }
+            public string idMachine { get; set; }
+            public string guid { get; set; }
+            public string phone { get; set; }
+            public string mail { get; set; }
+            public int port { get; set; }
+        }
+
+        class UserActivity
+        {
+            public string Username { get; set; }
+            public string ActivityDate { get; set; }
+            public string StatusError { get; set; }
+            public string Keterangan { get; set; }
+            public string IPClient { get; set; }
+            public string CultureInfos { get; set; }
+        }
+
+        class JsonData
+        {
+            public IEnumerable<DataUser> datauser { get; set; }
+            public IEnumerable<MasaPajak> masapajak { get; set; }
+            public TbItem items { get; set; }
+        }
+
+        class TbItem
+        {
+            public DataTable dtPajak { get; set; }
+            public DataTable dtLampiran { get; set; }
+            public string CultureInfos { get; set; }
+            public List<queryData> lstQuery { get; set; }
+        }
+
+        class queryData
+        {
+            public string nop { get; set; }
+            public string queryPajak { get; set; }
+            public string queryLampiran { get; set; }
+        }
+
+        class DataUser
+        {
+            public string username { get; set; }
+            public string key { get; set; }
+        }
+
+        class MasaPajak
+        {
+            public string bulan { get; set; }
+            public string tahun { get; set; }
+        }
+
+        class Transaction
+        {
+            public DateTime tanggal { get; set; }
+            public double total { get; set; }
+        }
+
+        class Today
+        {
+            public DateTime DateNow { get; set; }
+        }
+
+        class LastErrorRequest
+        {
+            public string username { get; set; }
+        }
+
+        class LastErrorResponse
+        {
+            public DateTime TanggalError { get; set; }
+        }
+    }
+}

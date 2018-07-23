@@ -1,0 +1,261 @@
+﻿@model POWebClient.Models.JatuhTempoViewModels
+@{
+    ViewBag.Title = "Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="page-header">
+    <h1>
+        Dashboard
+        <small>
+            <i class="ace-icon fa fa-angle-double-right"></i>
+            overview &amp; stats
+        </small>
+    </h1>
+</div><!-- /.page-header -->
+<div class="col-xs-12">
+    <div class="alert alert-block alert-success">
+        <button type="button" class="close" data-dismiss="alert">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+
+        <i class="ace-icon fa fa-check green"></i>
+
+        <strong class="green">
+            Dashboard Pajak Online
+            <small>(v1.0)</small>
+        </strong>,
+        Laman ini memuat informasi dashboard
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="page-header">
+            </div><!-- /.page-header -->
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="portlet box">
+                        <div class="portlet-header">
+                            <div class="caption">Transaksi User</div>
+                        </div>
+                        <hr />
+                        <form class="form-horizontal">
+                            <div class="form-group">
+                                <label for="nop" class="col-sm-1 control-label">
+                                    NOP
+                                </label>
+                                <div class="col-sm-6">
+                                    <div class="input-group">
+                                        @{
+                                            string role = Session["Nama_Role"].ToString();
+                                            if (string.Compare(role, "USER") == 0)
+                                            {
+                                                <select id="nop" name="nop" class="form-control"></select>
+                                            }
+                                            else
+                                            {
+                                                <input type="text" id="nop" class="form-control" />
+                                            }
+                                        }
+                                        <span class="input-group-btn">
+                                            <button type="button" id="btnFilter" class="btn btn-sm btn-success">Cari</button>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="col-sm-2">
+                                    <button type="button" id="btnyearbefore" class="btn btn-sm btn-primary">Tampilkan Tahun Sebelumnya</button>
+                                    <button type="button" id="btnyearnow" class="btn btn-sm btn-primary">Tampilkan Tahun Sekarang</button>
+                                </div>
+                                <div class="col-sm-3">
+                                    &nbsp;
+                                </div>
+                            </div>
+                        </form>
+                        <hr />
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h2 class="center year"></h2>
+                            </div>
+                        </div>
+                        <div class="portlet-body">
+                            <div id="line-chart" style="width: 100%; height:300px"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr />
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="row">
+                        <div class="col-xs-4 col-sm-3 pricing-span-header">
+                            <div class="widget-box pricing-box-small">
+                                <div class="widget-header">
+                                    <h5 class="widget-title bigger lighter">Jatuh Tempo</h5>
+                                </div>
+
+                                <div class="widget-body">
+                                    <div class="widget-main no-padding">
+                                        <ul class="list-unstyled list-striped pricing-table-header">
+                                            <li>Januari </li>
+                                            <li>Februari </li>
+                                            <li>Maret </li>
+                                            <li>April </li>
+                                            <li>Mei </li>
+                                            <li>Juni </li>
+                                            <li>Juli</li>
+                                            <li>Agustus</li>
+                                            <li>September</li>
+                                            <li>Oktober</li>
+                                            <li>November</li>
+                                            <li>Desember</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-8 col-sm-9 pricing-span-body">
+                            @{
+                                foreach (var item in Model.ListTahun)
+                                {
+                                    <div class="pricing-span">
+                                        <div class="widget-box pricing-box-small">
+                                            <div class="widget-header">
+                                                <h5 class="widget-title bigger lighter">@item.Tahun</h5>
+                                            </div>
+                                            <div class="widget-body">
+                                                <div class="widget-main no-padding">
+                                                    <ul class="list-unstyled list-striped pricing-table">
+                                                        @foreach (var itemvalue in Model.ListJatuhTempo.Where(m => m.Tahun == item.Tahun))
+                                                        {
+                                                            <li> @itemvalue.Tgl_Jatuh_Tempo.ToString("dd MMM yyyy")</li>
+                                                        }
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts{
+    <script src="~/Scripts/flot-chart/jquery.flot.js"></script>
+    <script src="~/Scripts/flot-chart/jquery.flot.categories.js"></script>
+    <script src="~/Scripts/flot-chart/jquery.flot.pie.js"></script>
+    <script src="~/Scripts/flot-chart/jquery.flot.tooltip.js"></script>
+    <script src="~/Scripts/flot-chart/jquery.flot.resize.js"></script>
+    <script src="~/Scripts/flot-chart/jquery.flot.fillbetween.js"></script>
+    <script src="~/Scripts/flot-chart/jquery.flot.stack.js"></script>
+    <script src="~/Scripts/flot-chart/jquery.flot.spline.js"></script>
+    <script>
+        $(document).ready(function () {
+            var nop = "";
+            var year = "";
+            $('#btnyearnow').hide();
+            $('#btnyearbefore').click(function () {
+                year = "-1";
+                getDataChart(nop, year)
+                $('#btnyearnow').show();
+                $('#btnyearbefore').hide();
+            });
+
+            $('#btnyearnow').click(function () {
+                year = "";
+                getDataChart(nop, year)
+                $('#btnyearnow').hide();
+                $('#btnyearbefore').show();
+            });
+            getDataChart(nop, year);
+            $("#btnFilter").click(function () {
+                $('#btnyearnow').hide();
+                $('#btnyearbefore').show();
+                nop = $("#nop").val();
+                year = "";
+                getDataChart(nop, year)
+            });
+            $.ajax({
+                url: '/User/FindNopUserApp',
+                type: 'POST',
+                dataType: 'JSON',
+                success: function (e) {
+                    if (e != undefined && e != null) {
+                        var optionNop = $("select#nop");
+                        for (var iNop = 0; iNop < e.resultDetail.length; iNop++) {
+                            //optionNop.append($("<option />").val(e.resultDetail[iNop].nop).text(e.resultDetail[iNop].nop));
+                            var maxLength = 100;
+                            var textValue = e.resultDetail[iNop].nop + " - " + e.resultDetail[iNop].Nama_Obyek;
+                            if (textValue.length > maxLength) {
+                                textValue = textValue.substr(0, 100) + "...";
+                            }
+                            optionNop.append($("<option />").val(e.resultDetail[iNop].nop).text(textValue));
+                        }
+                    }
+                }
+            });
+        });
+
+        function getDataChart(nop, year) {
+            $.ajax({
+                url: '/User/GetDataChart',
+                data: { nop: nop, year: year },
+                type: 'post',
+                dataType: 'json',
+                success: function (e) {
+                    if (e != undefined && e != null) {
+                        var year = "";
+                        $(".year").text(e.year);
+                        var d1_1 = [];
+                        var d1_2 = [];
+                        for (var iBefore = 0; iBefore < e.listDataChartBefore.length; iBefore++) {
+                            d1_1.push([e.listDataChartBefore[iBefore].month, parseFloat(e.listDataChartBefore[iBefore].nominal)]);
+                        }
+                        $.plot("#line-chart", [{
+                            data: d1_1,
+                            label: "Sebelum Adjustment",
+                            color: "#ffce54"
+                        }, {
+                            data: d1_2,
+                            label: "Sesudah Adjustment",
+                            color: "#3DB9D3"
+                        }], {
+                            series: {
+                                lines: {
+                                    show: !0,
+                                    fill: .01
+                                },
+                                points: {
+                                    show: !0,
+                                    radius: 4
+                                }
+                            },
+                            grid: {
+                                borderColor: "#fafafa",
+                                borderWidth: 1,
+                                hoverable: !0
+                            },
+                            tooltip: !0,
+                            tooltipOpts: {
+                                content: getTootips,
+                                defaultTheme: false
+                            },
+                            xaxis: {
+                                tickColor: "#fafafa",
+                                mode: "categories"
+                            },
+                            yaxis: {
+                                tickColor: "#fafafa"
+                            },
+                            shadowSize: 0
+                        });
+                    }
+                }
+            });
+        }
+        function getTootips(label, x, y) {
+            return "Bulan " + x + " = Rp. " + y.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,") + "";
+        }
+    </script>
+}

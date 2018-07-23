@@ -772,9 +772,6 @@ namespace POProject.API.Module
                         log.Info("End : /dev/postUserActivity");
                         return Response.AsJson(new { code = HttpStatusCode.Unauthorized, message = "Failed while deserializing object, data not found", body = string.Empty });
                     }
-
-                    log.Info("End : /dev/postUserActivity");
-                    return Response.AsJson(new { code = HttpStatusCode.OK, message = "User Activity Berhasil tersimpan.", body = string.Empty });
                 }
                 catch (Exception ex)
                 {

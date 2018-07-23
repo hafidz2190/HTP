@@ -21,7 +21,6 @@ namespace POFtpSender
         DataTable _dtPajak = new DataTable();
         DataTable _dtDetail = new DataTable();
         string _dbConnector = string.Empty;
-        Dictionary<string, string> _dictDB;
         List<JenisPajak> _lstPajak;
         string _queryPajakFinish = string.Empty;
         string _queryDetailFinish = string.Empty;

@@ -238,7 +238,6 @@ namespace POAdministrationTools
             serverDate = DateTime.Now;
             bool isSend = false;
             int statusCode = 0;
-            int iLoop = 0;
             string pesan = string.Empty;
 
             StringBuilder sb = new StringBuilder();

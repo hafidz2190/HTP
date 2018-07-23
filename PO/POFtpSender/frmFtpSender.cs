@@ -48,9 +48,6 @@ namespace POFtpSender
 
         private const string GET_TRANSACTION_DATE = "GET_TRANSACTION_DATE";
         private const string RESTART_APPLICATION = "RESTART_APPLICATION";
-
-        private int _iPanel = 0;
-        private int _iTextBox = 0;
         #endregion
 
         public frmFtpSender()

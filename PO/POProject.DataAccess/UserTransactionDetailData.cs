@@ -1,6 +1,5 @@
 ﻿using POProject.CommandAdapter;
 using System;
-using System;
 using System.Data;
 
 namespace POProject.DataAccess

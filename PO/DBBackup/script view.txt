@@ -1,0 +1,38 @@
+DROP VIEW PO.VW_GENERATEPAYMENT;
+
+/* Formatted on 10/1/2017 3:01:24 AM (QP5 v5.149.1003.31008) */
+CREATE OR REPLACE FORCE VIEW PO.VW_GENERATEPAYMENT
+(
+   USERNAME,
+   TANGGAL,
+   KETERANGAN,
+   IS_ADJUSMENT,
+   PAJAK_TERUTANG,
+   CREATEDATE,
+   IP_SENDER,
+   NOP,
+   FILE_ADJUSTMENT,
+   MASAPAJAK,
+   TAHUN
+)
+AS
+     SELECT b.USERNAME,
+            b.TANGGAL,
+            b.KETERANGAN,
+            b.IS_ADJUSMENT,
+            b.PAJAK_TERUTANG,
+            b.CREATEDATE,
+            b.IP_SENDER,
+            b.NOP,
+            b.FILE_ADJUSTMENT,
+            TO_CHAR (b.TANGGAL, 'MM') MASAPAJAK,
+            TO_CHAR (b.TANGGAL, 'YYYY') TAHUN
+       FROM    USER_TRANSACTION b
+            INNER JOIN
+               (  SELECT nop, tanggal, MAX (is_adjusment) is_adjusment
+                    FROM user_transaction
+                GROUP BY nop, tanggal) c
+            ON (    b.nop = c.nop
+                AND b.tanggal = c.tanggal
+                AND b.is_adjusment = c.is_adjusment)
+   ORDER BY nop, tanggal;

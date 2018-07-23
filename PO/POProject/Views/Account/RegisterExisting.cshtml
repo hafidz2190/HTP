@@ -1,0 +1,129 @@
+﻿@model POWebClient.Models.RegisterExistingViewModels
+@using CaptchaMvc.HtmlHelpers
+@{
+    Layout = null;
+    ViewBag.Title = "Register Existing";
+}
+<html>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta charset="utf-8" />
+    <title>Register Existing</title>
+    <meta name="description" content="User login page" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+    <link rel="stylesheet" href="~/Content/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/Content/font-awesome/4.5.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="~/Content/css/fonts.googleapis.com.css" />
+    <link rel="stylesheet" href="~/Content/css/ace.min.css" />
+    <link rel="stylesheet" href="~/Content/css/ace-rtl.min.css" />
+    <script src="~/Content/js/jquery-2.1.4.min.js"></script>
+</head>
+<body class="login-layout">
+    <div class="main-container">
+        <div class="main-content">
+            <div class="row">
+                <div class="col-sm-10 col-sm-offset-1">
+                    <div class="login-container">
+                        <br />
+                        <div class="center">
+                            <img width="160" height="180" src="~/Content/images/pemkot.png" />
+                            <h4 class="blue" id="id-company-text">&copy; BPKPD KOTA SURABAYA</h4>
+                        </div>
+                        <div class="space-6"></div>
+                        <div class="position-relative">
+                            <div id="signup-box" class="signup-box visible widget-box no-border">
+                                <div class="widget-body">
+                                    <div class="widget-main">
+                                        <h5 class="header green lighter bigger">
+                                            <i class="ace-icon fa fa-users blue"></i>
+                                            Daftar Menggunakan Akun BPKPD
+                                        </h5>
+                                        <div class="space-6"></div>
+                                        <p> masukkan data dibawah ini: </p>
+                                        @using (Html.BeginForm("RegisterExisting", "Account", FormMethod.Post, new { role = "form" }))
+                                        {
+                                            @Html.AntiForgeryToken()
+                                            @Html.ValidationSummary("", new { @class = "text-danger" })
+                                            <fieldset>
+                                                <label class="block clearfix">
+                                                    <span class="block input-icon input-icon-right">
+                                                        @*@Html.LabelFor(m => m.UsernameExisting, new { @class = "control-label" })*@
+                                                        @Html.TextBoxFor(m => m.UsernameExisting, new { @placeholder = "Username Existing", @class = "form-control" })
+                                                        @*@Html.ValidationMessageFor(m => m.UsernameExisting, "", new { @class = "text-danger" })*@
+                                                        <i class="ace-icon fa fa-user"></i>
+                                                    </span>
+                                                </label>
+                                                <label class="block clearfix">
+                                                    <span class="block input-icon input-icon-right">
+                                                        @*@Html.LabelFor(m => m.Email, new { @class = "control-label" })*@
+                                                        @Html.TextBoxFor(m => m.Email, new { @placeholder = "Email", @class = "form-control" })
+                                                        @*@Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })*@
+                                                        <i class="ace-icon fa fa-envelope"></i>
+                                                    </span>
+                                                </label>
+                                                <label class="block clearfix">
+                                                    <span class="block input-icon input-icon-right">
+                                                        @Html.TextBoxFor(m => m.UsernameBpkpd, new { @placeholder = "Username BPKPD", @class = "form-control" })                       
+                                                        @*@Html.ValidationMessageFor(m => m.UsernameBpkpd, "", new { @class = "text-danger" })*@
+                                                        <i class="ace-icon fa fa-user"></i>
+                                                    </span>
+                                                </label>
+                                                <label class="block clearfix">
+                                                    <span class="block input-icon input-icon-right">
+                                                        @*@Html.LabelFor(m => m.Password, new { @class = "control-label" })*@
+                                                        @Html.PasswordFor(m => m.Password, new { @placeholder = "Password", @class = "form-control" })
+                                                        <i id="btnshowpass" class="ace-icon fa fa-eye"></i>
+                                                    </span>
+                                                </label>
+                                                <label class="block clearfix">
+                                                    <span class="block input-icon input-icon-right">
+                                                        @Html.MathCaptcha("Refresh", "Masukkan hasil perhitungan diatas :", "Wajib Diisi", true)
+                                                    </span>
+                                                </label>
+                                                <div class="space-24"></div>
+                                                <div class="clearfix">
+                                                    <button type="reset" class="width-30 pull-left btn btn-sm">
+                                                        <i class="ace-icon fa fa-refresh"></i>
+                                                        <span class="bigger-110">reset</span>
+                                                    </button>
+                                                    <button type="submit" class="width-65 pull-right btn btn-sm btn-success">
+                                                        <span class="bigger-110">Daftar</span>
+                                                        <i class="ace-icon fa fa-arrow-right icon-on-right"></i>
+                                                    </button>
+                                                </div>
+                                            </fieldset>
+                                        }
+                                    </div>
+                                </div><!-- /.widget-body -->
+                            </div><!-- /.signup-box -->
+                        </div><!-- /.position-relative -->
+                    </div>
+                </div><!-- /.col -->
+            </div><!-- /.row -->
+        </div><!-- /.main-content -->
+    </div><!-- /.main-container -->
+
+    <script type="text/javascript">
+        if ('ontouchstart' in document.documentElement) document.write("<script src='~/Content/js/jquery.mobile.custom.min.js'>" + "<" + "/script>");
+    </script>
+    <script type="text/javascript">
+        jQuery(function ($) {
+            $(document).on('click', '.toolbar a[data-target]', function (e) {
+                e.preventDefault();
+                var target = $(this).data('target');
+                $('.widget-box.visible').removeClass('visible');//hide others
+                $(target).addClass('visible');//show target
+            });
+        });
+
+        $(document).ready(function () {
+            $("#btnshowpass").mouseup(function () {
+                $("#Password").attr("type", "password");
+            });
+            $("#btnshowpass").mousedown(function () {
+                $("#Password").attr("type", "text");
+            });
+        });
+    </script>
+</body>
+</html>

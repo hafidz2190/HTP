@@ -1,0 +1,416 @@
+﻿@model POWebClient.Models.SptpdModels
+@{
+    ViewBag.Title = "BPKPD - Cetak Validasi Sptpd";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Cetak Validasi SPTPD</h2>
+@section styles
+{
+    <!--<link type="text/css" href="~/Content/css/dashboard/fonts/font-awesome/css/font-awesome.min.css" rel="stylesheet" />        <!-- Font Awesome -->
+    <!--<link type="text/css" href="~/Content/css/dashboard/css/styles.css" rel="stylesheet" />                                     <!-- Core CSS with all styles -->
+    <!--<link type="text/css" href="~/Content/css/dashboard/plugins/jstree/dist/themes/avenger/style.min.css" rel="stylesheet" />    <!-- jsTree -->
+    <!--<link type="text/css" href="~/Content/css/dashboard/plugins/codeprettifier/prettify.css" rel="stylesheet" />                <!-- Code Prettifier -->
+    <!--<link type="text/css" href="~/Content/css/dashboard/plugins/iCheck/skins/minimal/blue.css" rel="stylesheet" />              <!-- iCheck -->
+    <!--<link type="text/css" href="~/Content/css/dashboard/plugins/form-daterangepicker/daterangepicker-bs3.css" rel="stylesheet" /> 	<!-- DateRangePicker -->
+    <!--<link type="text/css" href="~/Content/css/dashboard/plugins/fullcalendar/fullcalendar.css" rel="stylesheet" /> 					<!-- FullCalendar -->
+    <!--<link type="text/css" href="~/Content/css/dashboard/plugins/charts-chartistjs/chartist.min.css" rel="stylesheet" /> 				<!-- Chartist -->
+    <link href="@Url.Content("~/Content/print.css")" rel="Stylesheet" media="print" />
+    <style>
+        .table-responsive {
+            overflow-x: unset !important;
+        }
+
+        .print {
+            width: 619px;
+            background-color: #ffffff;
+            color: black;
+            font-family: Verdana;
+            font-size: 1em;
+            padding: 10px;
+        }
+
+            .print .printlogo {
+                float: left;
+                width: 88px;
+                height: 113px;
+                /* background-image: url(img/logosmall.png); */
+                background-position: left top;
+                background-repeat: no-repeat;
+            }
+
+            .print .printbarcode {
+                float: left;
+                width: 100px;
+                height: 113px;
+            }
+
+            .print .printmiddle {
+                width: 275px;
+                font-size: 11px;
+                float: left;
+                text-align: center;
+            }
+
+            .print .printbank {
+                float: left;
+                width: 198px;
+                height: 123px;
+                text-align: right;
+            }
+
+            .print .printheader {
+                width: 485px;
+                font-size: 11px;
+                float: left;
+                text-align: center;
+            }
+
+                .print .printheader h2 {
+                    font-family: Verdana;
+                    color: black;
+                    font-size: 14px;
+                    font-weight: bold;
+                    padding: 0;
+                    margin: 0;
+                    line-height: 22px;
+                    text-transform: uppercase;
+                }
+
+                .print .printheader p {
+                    color: #000000;
+                    padding: 5px 0 15px 0;
+                    margin: 0;
+                    line-height: 15px;
+                }
+
+            .print .innerprint {
+                margin-top: 10px;
+                padding: 20px 0 280px 0;
+                border-top: 3px solid black;
+                float: left;
+            }
+
+                .print .innerprint .tgljthtempo {
+                    font-family: Verdana, Geneva, Tahoma, sans-serif;
+                    font-weight: bold;
+                    font-size: 12px;
+                    text-align: left;
+                    padding-top: 14px;
+                    padding-bottom: 2px;
+                }
+
+                .print .innerprint .idsspd {
+                    font-size: 14px;
+                    font-weight: bold;
+                    padding-bottom: 10px;
+                }
+
+                .print .innerprint .note {
+                    font-family: Tahoma;
+                    font-size: 9px;
+                    text-align: left;
+                    margin-top: 10px;
+                    float: left;
+                }
+
+        .example ul {
+            list-style: none;
+        }
+
+            .example ul li::before {
+                content: "•";
+                color: red;
+                display: inline-block;
+                width: 1em;
+                margin-left: -1em;
+            }
+
+        ul, blockquote {
+            padding-left: 1em;
+        }
+
+        .panel {
+            background-color: #fff;
+            border: 1px solid #e0e0e0;
+            margin: 0 0 24px 0;
+            position: relative;
+            border-radius: 2px;
+        }
+
+            .panel.panel-sky {
+                border-color: #009688;
+            }
+
+
+                .panel.panel-sky .panel-heading {
+                    color: #ffffff;
+                    background-color: #009688;
+                    border-color: #009688;
+                }
+
+                    .panel.panel-sky .panel-heading h2 {
+                        color: #ffffff;
+                    }
+
+            .panel .panel-heading {
+                border-top-right-radius: 1px;
+                border-top-left-radius: 1px;
+                padding: 0px 16px 0px 16px;
+                line-height: 46px;
+                border-bottom: 1px solid #e0e0e0;
+            }
+
+                .panel .panel-heading h2 {
+                    color: #607d8b;
+                    height: 100%;
+                    width: auto;
+                    float: left;
+                    font-size: 13px;
+                    font-weight: 700;
+                    padding: 13px 0 13px;
+                    position: relative;
+                    margin: 0;
+                    line-height: 20px;
+                }
+
+            .panel .panel-body {
+                width: 100%;
+                position: relative;
+                font-size: 13px;
+                padding: 24px;
+            }
+    </style>
+}
+<div id="print" class="innercontent altsoft" align="center">
+    <div id="printcontent" class="print">
+        <div class="col-md-12">
+            <div class="row">
+                <div class="printlogo">
+                    <img id="printlogo" src="@Url.Content("~/Content/img/logosmall.png")" alt="Badan Pengelolaan Keuangan dan Pajak Daerah Kota Surabaya" />
+                </div>
+                <div class="printheader">
+                    <h2>
+                        Pemerintah Kota Surabaya
+                    </h2>
+                    <h2>
+                        Badan Pengelolaan Keuangan dan Pajak Daerah
+                    </h2>
+                    <p>
+                        Jl. Jimerto No. 25-27 lantai 1
+                        <br />
+                        Telp. (031) 5312144, 5343051, 5343057
+                        <br />
+                        <strong>SURABAYA</strong>
+                    </p>
+                </div>
+            </div>
+            <div class="clear">
+            </div>
+            <div class="innerprint">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="printbarcode">
+                            <div style="width:120px; text-align:left;">
+                                @DateTime.Now.ToString("dd MMMM yyyy", new System.Globalization.CultureInfo("id-ID"))
+                            </div>
+                            <div class="clear"></div><br />
+                            <img src="@Url.Action("Image", new { IdSptpd = Model.ReffBill })" alt="some image" width="76" height="76" />
+                        </div>
+                        <div class="printmiddle">
+                            <div class="idsspd">
+                                ID SPTPD PAJAK @Model.NamaPajak
+                                <div class="clear"></div>
+                                @Model.ReffBill.ToString()<br />
+                            </div>
+                            <div class="totalbayar">
+                                @Html.HiddenFor(m => m.Total)
+                                Total : Rp. @Model.Total.ToString("n0")
+                            </div>
+                            <div class="biayaadmin">
+                                Belum termasuk Adm BNI : Rp. 5.000
+                            </div>
+                            <div class="jumlahbayar">
+                                @Html.HiddenFor(m => m.Pajak)
+                                Pokok : Rp. @Model.Pajak.ToString("n0")
+                            </div>
+                            <div class="jumlahbayar">
+                                @Html.HiddenFor(m => m.Sanksi)
+                                Sanksi : Rp. @Model.Sanksi.ToString("n0")
+                            </div>
+                            @*<div class="encrypt">
+                                    @Pemkot.Encryption.Crypto.ActionEncrypt(@Model.ReffBill.Replace(" ", string.Empty))<br />
+                                </div>*@
+                        </div>
+                        <div class="printbank">
+                            <div class="idsspd">
+                                ID BAYAR BANK
+                            </div>
+                            <h6>@Model.NamaOP</h6>
+                            @foreach (var item in Model.lstVaBank)
+                            {
+                                <h6>@item.BankName: @item.VaCode</h6>
+                            }
+                            @*<h6>JATIM: @Model.ReffBill.ToString()</h6>*@
+                        </div>
+                    </div>
+                </div>
+                <div class="clear"></div>
+                <br />
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="tgljthtempo">
+                            @Html.HiddenFor(m => m.NamaBulan)
+                            Masapajak : @Model.NamaBulan @Model.TahunPajak <br />
+                            @Html.HiddenFor(m => m.TglJthTempo)
+                            Jatuh Tempo : @Model.strTglJthTempo
+                        </div>
+                        <br />
+                        <div class="panel panel-sky">
+                            <div class="panel-heading">
+                                @*<h2>Detail Pembayaran</h2>*@
+                            </div>
+                            <div class="panel-body">
+                                <div class="table-responsive">
+                                    <div id="tabletools_wrapper" class="dataTables_wrapper form-inline no-footer">
+                                        <div class="row">
+                                            <h5 style="text-align:left;padding-left:0">Detail Pembayaran</h5>
+                                        </div>
+                                        <table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered datatables no-footer" id="tabletools" role="grid" aria-describedby="tabletools_info">
+                                            <thead>
+                                                <tr role="row">
+                                                    <th class="sorting_asc" tabindex="0" aria-controls="tabletools" rowspan="1" colspan="1" aria-sort="ascending"
+                                                        aria-label="Nop: activate to sort column ascending" style="width: 232px; font-size:9px;">
+                                                        Nop
+                                                    </th>
+                                                    <th class="sorting_asc" tabindex="0" aria-controls="tabletools" rowspan="1" colspan="1" aria-sort="ascending"
+                                                        aria-label="Nama: activate to sort column ascending" style="width: 232px; font-size:9px;">
+                                                        Nama
+                                                    </th>
+                                                    <th class="sorting_asc" tabindex="0" aria-controls="tabletools" rowspan="1" colspan="1" aria-sort="ascending"
+                                                        aria-label="Alamat: activate to sort column ascending" style="width: 232px; font-size:9px;">
+                                                        Alamat
+                                                    </th>
+                                                    <th class="sorting_asc" tabindex="0" aria-controls="tabletools" rowspan="1" colspan="1" aria-sort="ascending"
+                                                        aria-label="Pokok: activate to sort column ascending" style="width: 232px; font-size:9px;">
+                                                        Pokok
+                                                    </th>
+                                                    <th class="sorting_asc" tabindex="0" aria-controls="tabletools" rowspan="1" colspan="1" aria-sort="ascending"
+                                                        aria-label="Sanksi: activate to sort column ascending" style="width: 232px; font-size:9px;">
+                                                        Sanksi
+                                                    </th>
+                                                    <th class="sorting_asc" tabindex="0" aria-controls="tabletools" rowspan="1" colspan="1" aria-sort="ascending"
+                                                        aria-label="Total: activate to sort column ascending" style="width: 232px; font-size:9px;">
+                                                        Total
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @for (int iRow = 0; iRow < Model.lstSptpd.Count; iRow++)
+                                                {
+
+                                                    if (iRow % 2 == 0)
+                                                    {
+                                                        <tr class="gradeA odd" role="row">
+                                                            <td class="sorting_1" style="font-size:10px; font-weight:normal;">@Model.lstSptpd[iRow].NOP</td>
+                                                            <td style="font-size:10px; font-weight:normal; ">@Model.lstSptpd[iRow].NamaOP</td>
+                                                            <td style="font-size:10px; font-weight:normal; ">@Model.lstSptpd[iRow].AlamatOP</td>
+                                                            <td style="font-size:10px; font-weight:normal; text-align:right;">@Model.lstSptpd[iRow].Pajak.ToString("n0")</td>
+                                                            <td style="font-size:10px; font-weight:normal; text-align:right;">@Model.lstSptpd[iRow].Sanksi.ToString("n0")</td>
+                                                            <td style="font-size:10px; font-weight:normal; text-align:right;">@Convert.ToDouble(Model.lstSptpd[iRow].Pajak + Model.lstSptpd[iRow].Sanksi).ToString("n0")</td>
+                                                        </tr>
+                                                    }
+                                                    else
+                                                    {
+                                                        <tr class="gradeA even" role="row">
+                                                            <td class="sorting_1" style="font-size:10px; font-weight:normal;">@Model.lstSptpd[iRow].NOP</td>
+                                                            <td style="font-size:10px; font-weight:normal;">@Model.lstSptpd[iRow].NamaOP</td>
+                                                            <td style="font-size:10px; font-weight:normal;">@Model.lstSptpd[iRow].AlamatOP</td>
+                                                            <td style="font-size:10px; font-weight:normal; text-align:right;">@Model.lstSptpd[iRow].Pajak.ToString("n0")</td>
+                                                            <td style="font-size:10px; font-weight:normal; text-align:right;">@Model.lstSptpd[iRow].Sanksi.ToString("n0")</td>
+                                                            <td style="font-size:10px; font-weight:normal; text-align:right;">@Convert.ToDouble(Model.lstSptpd[iRow].Pajak + Model.lstSptpd[iRow].Sanksi).ToString("n0")</td>
+                                                        </tr>
+                                                    }
+
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="note">
+                        Catatan:
+                        <br />
+                        1. Untuk kemudahan bawalah bukti/cetakan ini untuk melakukan pembayaran di Badan/UPTB/Bank atau ATM.
+                        <br />
+                        2. Pembayaran melalui ATM dapat dilakukan sebelum jatuh tempo.
+                        <br />
+                        3. Apabila telah lewat jatuh tempo, pembayaran akan dikenakan sanksi.
+                        <br />
+                        4. Bila pembayaran diperlukan nama penerima, Silahkan menggunakan nama yang tertera pada ID BAYAR BANK.
+                        <br />
+                        5. Apabila pembayaran menggunakan CEK/GIRO, paling lambat dilakukan 2 hari sebelum jatuh tempo.
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="note" style="font-size: 11px; font-weight: bold;">
+                        Penting:
+                        <br />
+                        <ul>
+                            <li>Apabila pembayaran dilakukan melalui transfer ke BNI, nominal dalam total yang harus dibayar ditambahkan Rp. 5.000 (diakumulasi).</li>
+                            <li>Gunakan kode bayar dalam ID-BAYAR Bank saat pembayaran untuk memperoleh e-SSPD.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="toolbar" align="center" class="printbutton">
+                    <input id="btnprint" type="button" class="cupid-green" value="Cetak" onclick="printDiv('print')" />
+                </div>
+            </div>
+        </div>
+    </div>
+    <br />
+</div>
+@section scripts{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            if (window.history && window.history.pushState) {
+                $(window).on('popstate', function () {
+                    var hashLocation = location.hash;
+                    var hashSplit = hashLocation.split("#!/");
+                    var hashName = hashSplit[1];
+                    if (hashName !== '') {
+                        var hash = window.location.hash;
+                        if (hash === '') {
+                            var konfirm = confirm('Anda ingin meninggalkan halaman ini?');
+                            if(konfirm == true)
+                            {
+                                window.location.href = "/Payment/GeneratePayment";
+                            }
+                            else
+                            {
+                                window.history.pushState('forward', null, './#forward');
+                            }
+                            //alert('klick');
+                        }
+                    }
+                });
+                window.history.pushState('forward', null, './#forward');
+            }
+        });
+
+        function printDiv(divName) {
+            var printContents = document.getElementById(divName).innerHTML;
+            var originalContents = document.body.innerHTML;
+
+            document.body.innerHTML = printContents;
+
+            window.print();
+
+            document.body.innerHTML = originalContents;
+        }
+    </script>
+}

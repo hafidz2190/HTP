@@ -1,0 +1,158 @@
+﻿@model POWebClient.Models.UserViewModels
+@{
+    Layout = null;
+    ViewBag.Title = "Log in";
+}
+<html>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta charset="utf-8" />
+    <title>Login</title>
+    <meta name="description" content="User login page" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+    <link rel="stylesheet" href="~/Content/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/Content/font-awesome/4.5.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="~/Content/css/fonts.googleapis.com.css" />
+    <link rel="stylesheet" href="~/Content/css/ace.min.css" />
+    <link rel="stylesheet" href="~/Content/css/ace-rtl.min.css" />
+    <script src="~/Content/js/jquery-2.1.4.min.js"></script>
+</head>
+
+<body class="login-layout">
+    <div class="main-container">
+        <div class="main-content">
+            <div class="row">
+                <div class="col-sm-10 col-sm-offset-1">
+                    <div class="login-container">
+                        <br />
+                        <div class="center">
+                            <img width="170" height="200" src="~/Content/images/pemkot.png"/>
+                            <h4 class="blue" id="id-company-text">&copy; BPKPD KOTA SURABAYA</h4>
+                        </div>
+                        <div class="space-6"></div>
+                        <div class="position-relative">
+                            <div id="login-box" class="login-box visible widget-box no-border">
+                                <div class="widget-body">
+                                    <div class="widget-main">
+                                        <h5 class="header blue lighter bigger">
+                                            <i class="ace-icon fa fa-coffee green"></i>
+                                            Masukkan Username dan Password
+                                        </h5>
+                                        <span class="text-success">@ViewBag.Message</span>
+                                        <div class="space-6"></div>
+
+                                        @using (Html.BeginForm("Login", "Account", new { ReturnUrl = Request.QueryString["ReturnUrl"] }, FormMethod.Post, new {role = "form" }))
+                                        {
+                                            @Html.AntiForgeryToken()
+                                            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                                            <fieldset>
+                                                <label class="block clearfix">
+                                                    <span class="block input-icon input-icon-right">
+                                                        @*@Html.LabelFor(m => m.Username)*@
+                                                        @Html.TextBoxFor(m => m.Username, new {@placeholder="Username", @class = "form-control" })                                                    
+                                                        @Html.ValidationMessageFor(m => m.Username, "", new { @class = "text-danger" })
+                                                        <i class="ace-icon fa fa-user"></i>
+                                                    </span>
+                                                </label>
+                                                <label class="block clearfix">
+                                                    <span class="block input-icon input-icon-right">
+                                                        @*@Html.LabelFor(m => m.Password)*@
+                                                        @Html.PasswordFor(m => m.Password, new { @placeholder = "Password", @class = "form-control" })
+                                                       
+                                                        @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+                                                        <i id="btnshowpass" class="ace-icon fa fa-eye"></i>
+                                                    </span>
+                                                </label>
+                                                @Html.HiddenFor(m => m.ReturnUrl)
+                                                <div class="space"></div>
+                                                <div class="clearfix">
+                                                    <button type="submit" class="width-35 pull-right btn btn-sm btn-primary">
+                                                        <i class="ace-icon fa fa-key"></i>
+                                                        <span class="bigger-110">Login</span>
+                                                    </button>
+                                                </div>
+                                                <div class="space-4"></div>
+                                            </fieldset>
+                                        }
+                                        <div class="social-or-login center">
+                                            <span class="bigger-110">*</span>
+                                        </div>
+                                        <div class="space-6"></div>
+                                        <div class="social-login center">
+                                            <span>
+                                                Login Menggunakan
+                                                <a href="~/Account/RegisterExisting" class="">
+                                                    <i class="">Akun BPKPD</i>
+                                                </a>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div><!-- /.widget-body -->
+                            </div><!-- /.login-box -->
+                            <div id="forgot-box" class="forgot-box widget-box no-border">
+                                <div class="widget-body">
+                                    <div class="widget-main">
+                                        <h4 class="header red lighter bigger">
+                                            <i class="ace-icon fa fa-key"></i>
+                                            Retrieve Password
+                                        </h4>
+                                        <div class="space-6"></div>
+                                        <p>
+                                            Enter your email and to receive instructions
+                                        </p>
+                                        <form>
+                                            <fieldset>
+                                                <label class="block clearfix">
+                                                    <span class="block input-icon input-icon-right">
+                                                        <input type="email" class="form-control" placeholder="Email" />
+                                                        <i class="ace-icon fa fa-envelope"></i>
+                                                    </span>
+                                                </label>
+
+                                                <div class="clearfix">
+                                                    <button type="button" class="width-35 pull-right btn btn-sm btn-danger">
+                                                        <i class="ace-icon fa fa-lightbulb-o"></i>
+                                                        <span class="bigger-110">Send Me!</span>
+                                                    </button>
+                                                </div>
+                                            </fieldset>
+                                        </form>
+                                    </div>
+                                    <div class="toolbar center">
+                                        <a href="#" data-target="#login-box" class="back-to-login-link">
+                                            Back to login
+                                            <i class="ace-icon fa fa-arrow-right"></i>
+                                        </a>
+                                    </div>
+                                </div><!-- /.widget-body -->
+                            </div><!-- /.forgot-box -->
+                        </div>
+                    </div>
+                </div><!-- /.col -->
+            </div><!-- /.row -->
+        </div><!-- /.main-content -->
+    </div><!-- /.main-container -->  
+    <script type="text/javascript">
+        if ('ontouchstart' in document.documentElement) document.write("<script src='~/Content/js/jquery.mobile.custom.min.js'>" + "<" + "/script>");
+    </script>
+    <!-- inline scripts related to this page -->
+    <script type="text/javascript">
+        jQuery(function ($) {
+            $(document).on('click', '.toolbar a[data-target]', function (e) {
+                e.preventDefault();
+                var target = $(this).data('target');
+                $('.widget-box.visible').removeClass('visible');//hide others
+                $(target).addClass('visible');//show target
+            });
+        });
+        $(document).ready(function () {
+            $("#btnshowpass").mouseup(function () {
+                $("#Password").attr("type", "password");
+            });
+            $("#btnshowpass").mousedown(function () {
+                $("#Password").attr("type", "text");
+            });
+        });
+    </script>
+</body>
+</html>

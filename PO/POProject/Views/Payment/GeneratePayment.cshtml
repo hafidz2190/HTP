@@ -1,0 +1,201 @@
+﻿
+@{
+    ViewBag.Title = "GeneratePayment";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@section styles{
+    <link rel="stylesheet" href="~/Content/jtable240/themes/lightcolor/blue/jtable.min.css" />
+}
+<div class="page-header">
+    <h1>
+        Dashboard
+        <small>
+            <i class="ace-icon fa fa-angle-double-right"></i>
+            overview &amp; stats
+        </small>
+    </h1>
+</div><!-- /.page-header -->
+
+<div class="col-xs-12">
+    <!-- PAGE CONTENT BEGINS -->
+    <div class="alert alert-block alert-success">
+        <button type="button" class="close" data-dismiss="alert">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+
+        <i class="ace-icon fa fa-check green"></i>
+
+        <strong class="green">
+            Dashboard Pajak Online
+            <small>(v1.0)</small>
+        </strong>,
+        Laman ini memuat generate payment
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="page-header">
+            </div><!-- /.page-header -->
+            <div class="row">
+                <div class="col-xs-12">
+                    <form class="form-horizontal">
+                        <div id="GeneretePaymentTableContainer"></div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-1"></div><div class="col-md-11">
+                                    <h3>
+                                        <strong>
+                                            <span>Total Pembayaran : </span>
+                                            <span id="totalbayar"></span>
+                                        </strong>
+                                    </h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <label><input type="checkbox" class="" name="cbAgreement" />&nbsp;&nbsp; Dengan menyetujui nominal bahwa nilai yang dibayar sudah sesuai, maka dengan ini saya menyatakan bahwa nominal pembayaran sudah benar.</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-actions text-right pal">
+                            <input type="button" id="btnGenerate" class="btn btn-sm btn-success" value="Generate Pembayaran" />
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts{
+    <script type="text/javascript" src="~/Content/jtable240/jquery.jtable.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var strnop = '';
+            var strmasapajak = '';
+            var strpajak = '';
+            var strtahun = '';
+            var isMultiMasaPajak = false;
+            var totalpajak = '';
+            var selectedRows = 0;
+            $('#btnGenerate').click(function () {
+                if (selectedRows > 0) {
+                    if (!isMultiMasaPajak) {
+                        if ($('input[name=cbAgreement]').is(':checked')) {
+                            $.ajax({
+                                url: '/Payment/SaveGeneratePayment',
+                                data: { nop: strnop, masapajak: strmasapajak, tahun: strtahun, pajak: strpajak, totalpajak: totalpajak },
+                                type: 'POST',
+                                dataType: 'JSON',
+                                beforeSend: function () {
+                                    $.blockUI({
+                                        css: {
+                                            border: 'none',
+                                            padding: '15px',
+                                            backgroundColor: '#000',
+                                            '-webkit-border-radius': '10px',
+                                            '-moz-border-radius': '10px',
+                                            opacity: .5,
+                                            color: '#fff'
+                                        }
+                                    });
+                                },
+                                complete: function () { $.unblockUI(); },
+                                success: function (e) {
+                                    if (e != undefined && e != null) {
+                                        alert(e.message);
+                                        if (e.isSuccess) {
+                                            window.location.href = e.redirect;
+                                        }
+
+                                    }
+                                }
+                            });
+                        } else {
+                            alert("Mohon pilih/centang persutujuan sebelum menekan tombol generate pembayaran");
+                        }
+                    } else {
+                        alert("Masa Pajak yang dipilih tidak boleh melebihi satu periode masa pajak.");
+                    }
+                } else {
+                    alert("Mohon pilih/centang data yang akan di generate");
+                }
+            });
+
+            $('#GeneretePaymentTableContainer').jtable({
+                title: 'List Generate Pembayaran',
+                paging: true, //Enable paging
+                sorting: true, //Enable sorting
+                defaultSorting: 'Name ASC',
+                selecting: true, //Enable selecting
+                multiselect: true, //Allow multiple selecting
+                selectingCheckboxes: true, //Show checkboxes on first column
+                //openChildAsAccordion: true, //Enable this line to show child tabes as accordion style
+                actions: {
+                    listAction: '/Payment/GetDateUserPayment'
+                },
+                fields: {
+                    Username: {
+                        list: false
+                    },
+                    Nop: {
+                        title: 'Nop'
+                    },
+                    MasaPajak: {
+                        title: 'Masa Pajak'
+                    },
+                    Tahun: {
+                        title: 'Tahun'
+                    },
+                    Pajak: {
+                        list: false
+                    },
+                    StrNominal: {
+                        title: 'Pajak Terhutang'
+                    }
+                },
+                selectionChanged: function () {
+                    //Get all selected rows
+                    var $selectedRows = $('#GeneretePaymentTableContainer').jtable('selectedRows');
+                    selectedRows = $selectedRows.length;
+                    var sum = 0;
+                    if ($selectedRows.length > 0) {
+                        //Show selected rows
+                        strnop = '';
+                        strpajak = '';
+                        var newMasaPajak = '';
+                        $selectedRows.each(function () {
+                            $("#totalbayar").empty();
+                            debugger;
+                            var record = $(this).data('record');
+                            if (newMasaPajak == '') {
+                                newMasaPajak = record.MasaPajak;
+                                isMultiMasaPajak = false;
+                            } else {
+                                if (newMasaPajak != record.MasaPajak) {
+                                    isMultiMasaPajak = true;
+                                } else {
+                                    isMultiMasaPajak = false;
+                                }
+                            }
+                            strmasapajak = record.MasaPajak;
+                            strtahun = record.Tahun;
+                            strnop = strnop + "," + record.Nop;
+                            strpajak = strpajak + "," + record.Pajak;
+                            sum += record.Pajak;
+                            totalpajak = sum;
+                            sum = Math.round(sum);
+                            $("#totalbayar").append("Rp. " + sum.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"));
+                        });
+                    }
+                    else {
+                        strnop = '';
+                        strpajak = '';
+                        $("#totalbayar").empty();
+                    }
+                }
+            });
+            $('#GeneretePaymentTableContainer').jtable('load');
+        });
+    </script>
+}

@@ -1,0 +1,144 @@
+﻿@model POWebClient.Models.DetailSptpdViewModels
+@{
+    ViewBag.Title = "DetailSptpd";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="page-header">
+    <h1>
+        Dashboard
+        <small>
+            <i class="ace-icon fa fa-angle-double-right"></i>
+            overview &amp; stats
+        </small>
+    </h1>
+</div><!-- /.page-header -->
+
+<div class="col-xs-12">
+    <!-- PAGE CONTENT BEGINS -->
+    <div class="alert alert-block alert-success">
+        <button type="button" class="close" data-dismiss="alert">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+
+        <i class="ace-icon fa fa-check green"></i>
+
+        <strong class="green">
+            Dashboard Pajak Online
+            <small>(v1.0)</small>
+        </strong>,
+        Laman ini memuat detail pembayaran
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="page-header">
+            </div><!-- /.page-header -->
+            <div class="row">
+                <div class="col-xs-12">
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <label for="nop" class="col-md-3 control-label">
+                                ID SPTPD
+                                @*<span class='require'>*</span>*@
+                            </label>
+                            <div class="col-md-9">
+                                @Html.TextBoxFor(m => m.IdSptpd, new { @class = "form-control", disabled = "disabled" })
+                                @Html.HiddenFor(m => m.encIdSptpd)
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="table table-responsive table-striped">
+                                <table id="tblDetailSptpd" style="border-bottom: 1px solid #ddd" class="table table-striped table-bordered table-hover table-advanced">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 100px; text-align: center;">
+                                                NOP
+                                            </th>
+                                            <th style="width: 100px; text-align: center;">
+                                                NAMA OP
+                                            </th>
+                                            <th style="width: 100px; text-align: center;">
+                                                ALAMAT
+                                            </th>
+                                            <th style="width: 70px; text-align: center;">
+                                                MASA PAJAK
+                                            </th>
+                                            <th style="width: 70px; text-align: center;">
+                                                TAHUN
+                                            </th>
+                                            <th style="width: 100px; text-align: center;">
+                                                Nominal
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in Model.ListDetail)
+                                        {
+                                            <tr valign="middle">
+                                                <td>@item.Nop</td>
+                                                <td>@item.ObyekPajak.NAMAOP</td>
+                                                <td>@item.ObyekPajak.ALAMAT</td>
+                                                <td>@item.MasaPajak</td>
+                                                <td>@item.Tahun</td>
+                                                <td>@item.StrNominal</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <label for="nop" class="col-md-3 control-label">
+                                Total yang harus di bayar :
+                                @*<span class='require'>*</span>*@
+                            </label>
+                            <div class="col-md-9">
+                                @Html.TextBoxFor(m => m.TotalPembayaran, new { @class = "form-control", disabled = "disabled" })
+                            </div>
+                        </div>
+                        <div class="form-actions text-right pal">
+                            <input type="button" id="btnCetak" class="btn btn-sm btn-success" value="Selesai dan Cetak Id Bayar" />
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var idSptpd = $("#encIdSptpd").val();
+
+            $("#btnCetak").click(function (e) {
+                window.open(
+                      'CetakValidasiSptpd?IdSptpd=' + idSptpd,
+                      '_blank' // <- This is what makes it open in a new window.
+                    );
+
+                //    $.ajax({
+                //        url: '/Payment/CetakValidasiSptpd',
+                //        data: { IdSptpd: idSptpd },
+                //        type: 'POST',
+                //        dataType: 'json',
+                //        success: function (data) {
+                //            //alert('Input Sukses');
+                //            if (data.Message == "OK") {
+                //                //$('#TableContainer').jtable('load', { NOP: nop });
+
+                //                //$("#Omset").val("0");
+                //                //$("#PajakTerutang").val("0");
+                //            }
+                //            else {
+                //                alert(data.Message);
+                //            }
+
+                //        },
+                //        error: function (data) {
+                //            alert(data.Message);
+                //        }
+                //    });
+            });
+        });
+    </script>
+}

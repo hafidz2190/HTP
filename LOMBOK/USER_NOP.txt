@@ -1,0 +1,96 @@
+ALTER TABLE PO.USER_NOP
+ DROP PRIMARY KEY CASCADE;
+
+DROP TABLE PO.USER_NOP CASCADE CONSTRAINTS;
+
+CREATE TABLE PO.USER_NOP
+(
+  USERNAME     VARCHAR2(100 BYTE)               NOT NULL,
+  NOP          VARCHAR2(24 BYTE)                NOT NULL,
+  JENIS_PAJAK  VARCHAR2(10 BYTE),
+  CREATE_DATE  DATE                             DEFAULT SYSDATE               NOT NULL,
+  NAMA_OBYEK   VARCHAR2(250 BYTE),
+  KETERANGAN   VARCHAR2(500 BYTE),
+  IS_DELETED   NUMBER                           DEFAULT 0
+)
+TABLESPACE PONLINE
+PCTUSED    0
+PCTFREE    10
+INITRANS   1
+MAXTRANS   255
+STORAGE    (
+            INITIAL          64K
+            NEXT             1M
+            MINEXTENTS       1
+            MAXEXTENTS       UNLIMITED
+            PCTINCREASE      0
+            BUFFER_POOL      DEFAULT
+           )
+LOGGING 
+NOCOMPRESS 
+NOCACHE
+NOPARALLEL
+MONITORING;
+
+
+CREATE UNIQUE INDEX PO.USER_NOP_PK ON PO.USER_NOP
+(USERNAME, NOP)
+LOGGING
+TABLESPACE PONLINE
+PCTFREE    10
+INITRANS   2
+MAXTRANS   255
+STORAGE    (
+            INITIAL          64K
+            NEXT             1M
+            MINEXTENTS       1
+            MAXEXTENTS       UNLIMITED
+            PCTINCREASE      0
+            BUFFER_POOL      DEFAULT
+           )
+NOPARALLEL;
+
+
+CREATE OR REPLACE TRIGGER PO.USER_NOP_DELETE
+   BEFORE DELETE
+   ON PO.USER_NOP    REFERENCING NEW AS New OLD AS Old
+   FOR EACH ROW
+DECLARE
+BEGIN
+   INSERT INTO USER_NOP_DELETED (USERNAME,
+                                 NOP,
+                                 JENIS_PAJAK,
+                                 CREATE_DATE,
+                                 NAMA_OBYEK,
+                                 KETERANGAN,
+                                 IS_DELETED,
+                                 TGL_HAPUS)
+        VALUES (:OLD.USERNAME,
+                :OLD.NOP,
+                :OLD.JENIS_PAJAK,
+                :OLD.CREATE_DATE,
+                :OLD.NAMA_OBYEK,
+                :OLD.KETERANGAN,
+                :OLD.IS_DELETED,
+                SYSDATE);
+EXCEPTION
+   WHEN OTHERS
+   THEN
+      -- Consider logging the error and then re-raise
+      RAISE;
+END;
+/
+
+
+DROP PUBLIC SYNONYM USER_NOP;
+
+CREATE PUBLIC SYNONYM USER_NOP FOR PO.USER_NOP;
+
+
+ALTER TABLE PO.USER_NOP ADD (
+  CONSTRAINT USER_NOP_PK
+  PRIMARY KEY
+  (USERNAME, NOP)
+  USING INDEX PO.USER_NOP_PK);
+
+GRANT SELECT ON PO.USER_NOP TO YUDA;

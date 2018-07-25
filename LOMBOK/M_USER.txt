@@ -1,0 +1,98 @@
+ALTER TABLE PO.M_USER
+ DROP PRIMARY KEY CASCADE;
+
+DROP TABLE PO.M_USER CASCADE CONSTRAINTS;
+
+CREATE TABLE PO.M_USER
+(
+  ID_ROLE      VARCHAR2(2 BYTE)                 NOT NULL,
+  USERNAME     VARCHAR2(100 BYTE)               NOT NULL,
+  PASSWORD     VARCHAR2(500 BYTE)               NOT NULL,
+  IS_ACTIVE    NUMBER(1)                        DEFAULT 1,
+  CREATE_DATE  DATE                             DEFAULT SYSDATE,
+  IS_DELETED   NUMBER(1)                        DEFAULT 0,
+  USER_APP     VARCHAR2(5 BYTE)
+)
+TABLESPACE PONLINE
+PCTUSED    0
+PCTFREE    10
+INITRANS   1
+MAXTRANS   255
+STORAGE    (
+            INITIAL          64K
+            NEXT             1M
+            MINEXTENTS       1
+            MAXEXTENTS       UNLIMITED
+            PCTINCREASE      0
+            BUFFER_POOL      DEFAULT
+           )
+LOGGING 
+NOCOMPRESS 
+NOCACHE
+NOPARALLEL
+MONITORING;
+
+COMMENT ON COLUMN PO.M_USER.IS_ACTIVE IS '0=NON ACTIVE;1=ACTIVE';
+
+COMMENT ON COLUMN PO.M_USER.IS_DELETED IS '0=UNDELETED;1=DELETED';
+
+
+CREATE UNIQUE INDEX PO.M_USER_PK ON PO.M_USER
+(USERNAME, USER_APP)
+LOGGING
+TABLESPACE PONLINE
+PCTFREE    10
+INITRANS   2
+MAXTRANS   255
+STORAGE    (
+            INITIAL          64K
+            NEXT             1M
+            MINEXTENTS       1
+            MAXEXTENTS       UNLIMITED
+            PCTINCREASE      0
+            BUFFER_POOL      DEFAULT
+           )
+NOPARALLEL;
+
+
+CREATE OR REPLACE TRIGGER PO.M_USER_DELETE
+   BEFORE DELETE
+   ON PO.M_USER    REFERENCING NEW AS New OLD AS Old
+   FOR EACH ROW
+DECLARE
+BEGIN
+   INSERT INTO M_USER_DELETED (ID_ROLE,
+                               USERNAME,
+                               PASSWORD,
+                               IS_ACTIVE,
+                               CREATE_DATE,
+                               IS_DELETED,
+                               USER_APP,
+                               TGL_HAPUS)
+        VALUES (:OLD.ID_ROLE,
+                :OLD.USERNAME,
+                :OLD.PASSWORD,
+                :OLD.IS_ACTIVE,
+                :OLD.CREATE_DATE,
+                :OLD.IS_DELETED,
+                :OLD.USER_APP,
+                SYSDATE);
+EXCEPTION
+   WHEN OTHERS
+   THEN
+      -- Consider logging the error and then re-raise
+      RAISE;
+END;
+/
+
+
+ALTER TABLE PO.M_USER ADD (
+  CONSTRAINT M_USER_PK
+  PRIMARY KEY
+  (USERNAME, USER_APP)
+  USING INDEX PO.M_USER_PK);
+
+ALTER TABLE PO.M_USER ADD (
+  CONSTRAINT FK_M_USER 
+  FOREIGN KEY (ID_ROLE) 
+  REFERENCES PO.M_ROLE (ID_ROLE));

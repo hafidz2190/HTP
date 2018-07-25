@@ -1,0 +1,154 @@
+DROP TABLE PO.USER_TRANSACTION_DETAIL CASCADE CONSTRAINTS;
+
+CREATE TABLE PO.USER_TRANSACTION_DETAIL
+(
+  USERNAME          VARCHAR2(100 BYTE)          NOT NULL,
+  XML_PATH          VARCHAR2(100 CHAR),
+  TRANSACTION_DATE  DATE,
+  IP_ADDRESS        VARCHAR2(25 BYTE),
+  XML_FILE          CLOB,
+  BULAN             NUMBER(2),
+  TAHUN             NUMBER(4),
+  NOP               VARCHAR2(30 BYTE),
+  CREATE_DATE       DATE                        DEFAULT sysdate
+)
+LOB (XML_FILE) STORE AS (
+  TABLESPACE PONLINE
+  ENABLE       STORAGE IN ROW
+  CHUNK       8192
+  RETENTION
+  NOCACHE
+  LOGGING
+  INDEX       (
+        TABLESPACE PONLINE
+        STORAGE    (
+                    INITIAL          64K
+                    NEXT             1M
+                    MINEXTENTS       1
+                    MAXEXTENTS       UNLIMITED
+                    PCTINCREASE      0
+                    BUFFER_POOL      DEFAULT
+                   ))
+      STORAGE    (
+                  INITIAL          64K
+                  NEXT             1M
+                  MINEXTENTS       1
+                  MAXEXTENTS       UNLIMITED
+                  PCTINCREASE      0
+                  BUFFER_POOL      DEFAULT
+                 ))
+TABLESPACE PONLINE
+PCTUSED    0
+PCTFREE    10
+INITRANS   1
+MAXTRANS   255
+STORAGE    (
+            INITIAL          192K
+            NEXT             1M
+            MINEXTENTS       1
+            MAXEXTENTS       UNLIMITED
+            PCTINCREASE      0
+            BUFFER_POOL      DEFAULT
+           )
+LOGGING 
+NOCOMPRESS 
+NOCACHE
+NOPARALLEL
+MONITORING;
+
+
+CREATE INDEX PO.IDX_CREATEDATE ON PO.USER_TRANSACTION_DETAIL
+(CREATE_DATE)
+NOLOGGING
+TABLESPACE PONLINE
+PCTFREE    10
+INITRANS   2
+MAXTRANS   255
+STORAGE    (
+            INITIAL          64K
+            NEXT             1M
+            MINEXTENTS       1
+            MAXEXTENTS       UNLIMITED
+            PCTINCREASE      0
+            BUFFER_POOL      DEFAULT
+           )
+PARALLEL ( DEGREE DEFAULT INSTANCES DEFAULT );
+
+
+CREATE INDEX PO.IDX_NOP ON PO.USER_TRANSACTION_DETAIL
+(NOP)
+NOLOGGING
+TABLESPACE PONLINE
+PCTFREE    10
+INITRANS   2
+MAXTRANS   255
+STORAGE    (
+            INITIAL          64K
+            NEXT             1M
+            MINEXTENTS       1
+            MAXEXTENTS       UNLIMITED
+            PCTINCREASE      0
+            BUFFER_POOL      DEFAULT
+           )
+PARALLEL ( DEGREE DEFAULT INSTANCES DEFAULT );
+
+
+CREATE INDEX PO.IDX_TRANS_DATE ON PO.USER_TRANSACTION_DETAIL
+(TRANSACTION_DATE)
+NOLOGGING
+TABLESPACE PONLINE
+PCTFREE    10
+INITRANS   2
+MAXTRANS   255
+STORAGE    (
+            INITIAL          64K
+            NEXT             1M
+            MINEXTENTS       1
+            MAXEXTENTS       UNLIMITED
+            PCTINCREASE      0
+            BUFFER_POOL      DEFAULT
+           )
+PARALLEL ( DEGREE DEFAULT INSTANCES DEFAULT );
+
+
+CREATE OR REPLACE TRIGGER PO.DEL_TRANSACTION_DETAIL
+   BEFORE DELETE
+   ON PO.USER_TRANSACTION_DETAIL    REFERENCING NEW AS New OLD AS Old
+   FOR EACH ROW
+DECLARE
+BEGIN
+   INSERT INTO TRANSACTION_DETAIL_DELETED (USERNAME,
+                                           XML_PATH,
+                                           TRANSACTION_DATE,
+                                           IP_ADDRESS,
+                                           XML_FILE,
+                                           BULAN,
+                                           TAHUN,
+                                           NOP,
+                                           CREATE_DATE,
+                                           TGL_HAPUS)
+        VALUES (:OLD.USERNAME,
+                :OLD.XML_PATH,
+                :OLD.TRANSACTION_DATE,
+                :OLD.IP_ADDRESS,
+                :OLD.XML_FILE,
+                :OLD.BULAN,
+                :OLD.TAHUN,
+                :OLD.NOP,
+                :OLD.CREATE_DATE,
+                SYSDATE);
+EXCEPTION
+   WHEN OTHERS
+   THEN
+      -- Consider logging the error and then re-raise
+      RAISE;
+END;
+/
+
+
+DROP PUBLIC SYNONYM USER_TRANSACTION_DETAIL;
+
+CREATE PUBLIC SYNONYM USER_TRANSACTION_DETAIL FOR PO.USER_TRANSACTION_DETAIL;
+
+
+GRANT SELECT ON PO.USER_TRANSACTION_DETAIL TO YUDA;

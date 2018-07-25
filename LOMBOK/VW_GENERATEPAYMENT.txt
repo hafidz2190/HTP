@@ -1,0 +1,56 @@
+DROP VIEW PO.VW_GENERATEPAYMENT;
+
+/* Formatted on 7/20/2018 11:03:32 PM (QP5 v5.149.1003.31008) */
+CREATE OR REPLACE FORCE VIEW PO.VW_GENERATEPAYMENT
+(
+   USERNAME,
+   TANGGAL,
+   KETERANGAN,
+   IS_ADJUSMENT,
+   PAJAK_TERUTANG,
+   CREATEDATE,
+   IP_SENDER,
+   NOP,
+   FILE_ADJUSTMENT,
+   MASAPAJAK,
+   TAHUN,
+   IS_GENERATE
+)
+AS
+     SELECT b.USERNAME,
+            b.TANGGAL,
+            b.KETERANGAN,
+            b.IS_ADJUSMENT,
+            b.PAJAK_TERUTANG,
+            b.CREATEDATE,
+            b.IP_SENDER,
+            b.NOP,
+            b.FILE_ADJUSTMENT,
+            TO_CHAR (b.TANGGAL, 'MM') MASAPAJAK,
+            TO_CHAR (b.TANGGAL, 'YYYY') TAHUN,
+            b.is_generate
+       FROM                                             /* USER_TRANSACTION */
+           (   SELECT username,
+                      tanggal,
+                      pajak_terutang,
+                      keterangan,
+                      is_adjusment,
+                      createdate,
+                      ip_sender,
+                      nop,
+                      file_adjustment,
+                      is_generate,
+                      ROW_NUMBER ()
+                      OVER (PARTITION BY NOP, TRUNC (TANGGAL)
+                            ORDER BY CREATEDATE DESC)
+                         RN
+                 FROM user_transaction /*WHERE RN=1 IS_ADJUSMENT = 0 AND to_char(tanggal,'MM')=:monTrans AND TO_CHAR(tanggal,'YYYY')=:year  AND nop=:nop*/
+                                      ) b
+            INNER JOIN
+               (  SELECT nop, tanggal, MAX (is_adjusment) is_adjusment
+                    FROM user_transaction
+                GROUP BY nop, tanggal) c
+            ON (b.nop = c.nop AND b.tanggal = c.tanggal AND b.RN = 1 /*AND b.is_adjusment = c.is_adjusment*/
+                                                                    )
+   /*WHERE b.nop in ('357801101090200091') and to_char(b.tanggal,'MM')='03' and TO_CHAR (b.TANGGAL, 'YYYY')='2018'*/
+   ORDER BY nop, tanggal;

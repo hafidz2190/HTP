@@ -1,0 +1,108 @@
+ALTER TABLE PO.USER_CLIENT
+ DROP PRIMARY KEY CASCADE;
+
+DROP TABLE PO.USER_CLIENT CASCADE CONSTRAINTS;
+
+CREATE TABLE PO.USER_CLIENT
+(
+  USERNAME      VARCHAR2(100 BYTE)              NOT NULL,
+  ID_MACHINE    VARCHAR2(100 BYTE)              NOT NULL,
+  PASSWORD      VARCHAR2(40 CHAR)               NOT NULL,
+  WEB_USERNAME  VARCHAR2(50 BYTE),
+  SERIAL_KEY    VARCHAR2(50 BYTE),
+  CREATE_DATE   DATE                            DEFAULT SYSDATE               NOT NULL,
+  PHONE         VARCHAR2(50 BYTE)               NOT NULL,
+  EMAIL         VARCHAR2(100 BYTE)              NOT NULL,
+  KODE_BANK     VARCHAR2(3 BYTE),
+  STATUS_AKTIF  NUMBER(38)                      DEFAULT 1,
+  PORT_CLIENT   NUMBER
+)
+TABLESPACE PONLINE
+PCTUSED    0
+PCTFREE    10
+INITRANS   1
+MAXTRANS   255
+STORAGE    (
+            INITIAL          64K
+            NEXT             1M
+            MINEXTENTS       1
+            MAXEXTENTS       UNLIMITED
+            PCTINCREASE      0
+            BUFFER_POOL      DEFAULT
+           )
+LOGGING 
+NOCOMPRESS 
+NOCACHE
+NOPARALLEL
+MONITORING;
+
+
+CREATE UNIQUE INDEX PO.MST_USER_PK ON PO.USER_CLIENT
+(USERNAME, ID_MACHINE)
+LOGGING
+TABLESPACE PONLINE
+PCTFREE    10
+INITRANS   2
+MAXTRANS   255
+STORAGE    (
+            INITIAL          64K
+            NEXT             1M
+            MINEXTENTS       1
+            MAXEXTENTS       UNLIMITED
+            PCTINCREASE      0
+            BUFFER_POOL      DEFAULT
+           )
+NOPARALLEL;
+
+
+CREATE OR REPLACE TRIGGER PO.USER_DELETE
+   BEFORE DELETE
+   ON PO.USER_CLIENT    REFERENCING NEW AS New OLD AS Old
+   FOR EACH ROW
+DECLARE
+BEGIN
+   INSERT INTO USER_CLIENT_DELETED (CREATE_DATE,
+                                    EMAIL,
+                                    ID_MACHINE,
+                                    KODE_BANK,
+                                    PASSWORD,
+                                    PHONE,
+                                    PORT_CLIENT,
+                                    SERIAL_KEY,
+                                    STATUS_AKTIF,
+                                    USERNAME,
+                                    WEB_USERNAME,
+                                    TGL_HAPUS)
+        VALUES (:OLD.CREATE_DATE,
+                :OLD.EMAIL,
+                :OLD.ID_MACHINE,
+                :OLD.KODE_BANK,
+                :OLD.PASSWORD,
+                :OLD.PHONE,
+                :OLD.PORT_CLIENT,
+                :OLD.SERIAL_KEY,
+                :OLD.STATUS_AKTIF,
+                :OLD.USERNAME,
+                :OLD.WEB_USERNAME,
+                SYSDATE);
+EXCEPTION
+   WHEN OTHERS
+   THEN
+      -- Consider logging the error and then re-raise
+      RAISE;
+END;
+/
+
+
+DROP PUBLIC SYNONYM USER_CLIENT;
+
+CREATE PUBLIC SYNONYM USER_CLIENT FOR PO.USER_CLIENT;
+
+
+ALTER TABLE PO.USER_CLIENT ADD (
+  CONSTRAINT MST_USER_PK
+  PRIMARY KEY
+  (USERNAME, ID_MACHINE)
+  USING INDEX PO.MST_USER_PK);
+
+GRANT SELECT ON PO.USER_CLIENT TO YUDA;

@@ -1,0 +1,121 @@
+DROP TABLE PO.USER_TRANSACTION CASCADE CONSTRAINTS;
+
+CREATE TABLE PO.USER_TRANSACTION
+(
+  USERNAME         VARCHAR2(100 BYTE)           NOT NULL,
+  TANGGAL          DATE                         NOT NULL,
+  PAJAK_TERUTANG   NUMBER,
+  KETERANGAN       VARCHAR2(500 BYTE),
+  IS_ADJUSMENT     NUMBER(38)                   DEFAULT 0,
+  CREATEDATE       DATE                         DEFAULT SYSDATE,
+  IP_SENDER        VARCHAR2(20 BYTE),
+  NOP              VARCHAR2(30 BYTE),
+  FILE_ADJUSTMENT  BLOB,
+  IS_GENERATE      NUMBER(1)                    DEFAULT 0
+)
+LOB (FILE_ADJUSTMENT) STORE AS (
+  TABLESPACE PONLINE
+  ENABLE       STORAGE IN ROW
+  CHUNK       8192
+  RETENTION
+  NOCACHE
+  LOGGING
+  INDEX       (
+        TABLESPACE PONLINE
+        STORAGE    (
+                    INITIAL          64K
+                    NEXT             1M
+                    MINEXTENTS       1
+                    MAXEXTENTS       UNLIMITED
+                    PCTINCREASE      0
+                    BUFFER_POOL      DEFAULT
+                   ))
+      STORAGE    (
+                  INITIAL          64K
+                  NEXT             1M
+                  MINEXTENTS       1
+                  MAXEXTENTS       UNLIMITED
+                  PCTINCREASE      0
+                  BUFFER_POOL      DEFAULT
+                 ))
+TABLESPACE PONLINE
+PCTUSED    0
+PCTFREE    10
+INITRANS   1
+MAXTRANS   255
+STORAGE    (
+            INITIAL          64K
+            NEXT             1M
+            MINEXTENTS       1
+            MAXEXTENTS       UNLIMITED
+            PCTINCREASE      0
+            BUFFER_POOL      DEFAULT
+           )
+LOGGING 
+NOCOMPRESS 
+NOCACHE
+NOPARALLEL
+MONITORING;
+
+
+CREATE INDEX PO.IDX_DATE ON PO.USER_TRANSACTION
+(CREATEDATE)
+LOGGING
+TABLESPACE PONLINE
+PCTFREE    10
+INITRANS   2
+MAXTRANS   255
+STORAGE    (
+            INITIAL          64K
+            NEXT             1M
+            MINEXTENTS       1
+            MAXEXTENTS       UNLIMITED
+            PCTINCREASE      0
+            BUFFER_POOL      DEFAULT
+           )
+NOPARALLEL;
+
+
+CREATE OR REPLACE TRIGGER PO.DEL_USER_TRANSACTION
+   BEFORE DELETE
+   ON PO.USER_TRANSACTION    REFERENCING NEW AS New OLD AS Old
+   FOR EACH ROW
+DECLARE
+BEGIN
+   INSERT INTO USER_TRANSACTION_DELETED (USERNAME,
+                                         TANGGAL,
+                                         PAJAK_TERUTANG,
+                                         KETERANGAN,
+                                         IS_ADJUSMENT,
+                                         CREATEDATE,
+                                         IP_SENDER,
+                                         NOP,
+                                         FILE_ADJUSTMENT,
+                                         IS_GENERATE,
+                                         TGL_HAPUS)
+        VALUES (:OLD.USERNAME,
+                :OLD.TANGGAL,
+                :OLD.PAJAK_TERUTANG,
+                :OLD.KETERANGAN,
+                :OLD.IS_ADJUSMENT,
+                :OLD.CREATEDATE,
+                :OLD.IP_SENDER,
+                :OLD.NOP,
+                :OLD.FILE_ADJUSTMENT,
+                :OLD.IS_GENERATE,
+                SYSDATE);
+EXCEPTION
+   WHEN OTHERS
+   THEN
+      -- Consider logging the error and then re-raise
+      RAISE;
+END;
+/
+
+
+DROP PUBLIC SYNONYM USER_TRANSACTION;
+
+CREATE PUBLIC SYNONYM USER_TRANSACTION FOR PO.USER_TRANSACTION;
+
+
+GRANT SELECT ON PO.USER_TRANSACTION TO YUDA;

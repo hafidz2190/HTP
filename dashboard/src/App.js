@@ -1,8 +1,32 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import logo from './logo.svg';
 import './App.css';
 
+import * as AppStateAction from './js/stores/actions/appStateActions';
+
+import { HubConnection } from 'signalr-client-react';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+
+function mapStateToProps(state) {
+  return {
+    appState: state.appState
+  };
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    appStateAction: bindActionCreators(AppStateAction, dispatch)
+  };
+}
+
+
 class App extends Component {
+  constructor(props) {
+    super(props);
+  }
+
   render() {
     return (
       <div className="App">
@@ -18,4 +42,10 @@ class App extends Component {
   }
 }
 
-export default App;
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);
+
+App.propTypes = {
+    appState: PropTypes.any,
+    appStateAction: PropTypes.any
+};

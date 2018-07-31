@@ -1,0 +1,6 @@
+export const VIEW_MODE = {
+    LOGIN: 'Login',
+    LOGIN_SYSTEM_BUSY: 'LOGIN_SYSTEM_BUSY',
+    LOGIN_CONFIRMATION: 'LOGIN_CONFIRMATION',
+    NORMAL: 'Normal'
+  };

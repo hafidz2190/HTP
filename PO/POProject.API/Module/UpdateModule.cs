@@ -4,7 +4,7 @@ using Nancy.Extensions;
 using Nancy.Responses;
 using Newtonsoft.Json;
 using POProject.BusinessLogic;
-using POProject.BusinessLogic.Entity;
+using POProject.Model;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -23,9 +23,13 @@ namespace POProject.API.Module
         private const string GET_LATEST_VERSION = ROOT_PATH + "getLatestVersion";
         private const string UPDATE = ROOT_PATH + "update";
 
-        private static readonly ILog log = LogManager.GetLogger(typeof(DevModule));
-        public UpdateModule()
+        private static readonly ILog log = LogManager.GetLogger(typeof(UpdateModule));
+        private readonly IUpdateVersionBusiness _updateVersionBusiness;
+
+        public UpdateModule(IUpdateVersionBusiness updateVersionBusiness)
         {
+            _updateVersionBusiness = updateVersionBusiness;
+
             //Get["download/update2"] = pars => Response.AsFile("devModule.rar", "application/x-rar-compressed, application/octet-stream");
 
             Get[GET_LATEST_VERSION] = parameter =>
@@ -34,7 +38,7 @@ namespace POProject.API.Module
                 List<UpdateVersion> latestVers = new List<UpdateVersion>();
                 try
                 {
-                    latestVers = UpdateVersionBusiness.GetVersion();
+                    latestVers = _updateVersionBusiness.GetVersion();
                     log.Debug("Get Version Success");
                 }
                 catch (Exception ex)

@@ -1,103 +1,100 @@
-﻿using POProject.BusinessLogic.Entity;
-using POProject.DataAccess;
+﻿using POProject.BusinessLogic.BusinessData;
+using POProject.BusinessLogic.BusinessDataModel;
+using POProject.BusinessLogic.Helper;
+using POProject.Model;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 
 namespace POProject.BusinessLogic
 {
-    public class UserTransactionBusiness
+    public class UserTransactionBusiness : IUserTransactionBusiness
     {
-        public static bool InsertUserTransaction(string username, DateTime transactionDate, double taxAmount, string ipAddress, string note, bool isAdjustment, string nop)
+        private readonly IUserTransactionBusinessData _userTransactionBusinessData;
+
+        public UserTransactionBusiness(IUserTransactionBusinessData userTransactionBusinessData)
         {
-            return UserTransactionData.InsertUserTransaction(username, transactionDate, taxAmount, note, isAdjustment, ipAddress, nop);
+            _userTransactionBusinessData = userTransactionBusinessData;
         }
 
-        public static bool InsertUserTransactionWithFile(string username, DateTime transactionDate, double taxAmount, string ipAddress,
-            string note, bool isAdjustment, string nop, byte[] file)
+        public bool InsertUserTransaction(string username, DateTime transactionDate, double taxAmount, string ipAddress, string note, bool isAdjustment, string nop)
         {
-            return UserTransactionData.InsertUserTransaction(username, transactionDate, taxAmount, note, isAdjustment, ipAddress, nop, file);
-        }
-        public static List<UserTransaction> RetrieveUserTransaction(string username, DateTime tglTransaction)
-        {
-            return UserTransactionData.RetrieveUserTransaction(username, tglTransaction).AsEnumerable<UserTransaction>().ToList();
+            return _userTransactionBusinessData.InsertUserTransaction(username, transactionDate, taxAmount, ipAddress, note, isAdjustment, nop);
         }
 
-        public static List<UserTransaction> RetrieveUserTransactionByNop(string nop, DateTime tglTransaction)
+        public bool InsertUserTransactionWithFile(string username, DateTime transactionDate, double taxAmount, string ipAddress, string note, bool isAdjustment, string nop, byte[] file)
         {
-            return UserTransactionData.RetrieveUserTransactionByNop(nop, tglTransaction).AsEnumerable<UserTransaction>().ToList();
+            return _userTransactionBusinessData.InsertUserTransactionWithFile(username, transactionDate, taxAmount, ipAddress, note, isAdjustment, nop, file);
         }
 
-        public static List<UserTransactionWithJenisPajak> RetrieveUserTransactionBetweenDate(DateTime tglAwal, DateTime tglAkhir)
+        public List<UserTransactionBusinessDataModel> RetrieveUserTransaction(string username, DateTime tglTransaction)
         {
-            return UserTransactionData.RetrieveUserTransactionBetweenDate(tglAwal, tglAkhir).AsEnumerable<UserTransactionWithJenisPajak>().ToList();
+            return ModelToBusinessModelMapper.Convert<UserTransaction, UserTransactionBusinessDataModel>(_userTransactionBusinessData.RetrieveUserTransaction(username, tglTransaction));
         }
 
-        public static IEnumerable<UserTransaction> RetrieveUserTransactionByMonth(string username, int monthTransaction, int yearTransaction)
+        public List<UserTransactionBusinessDataModel> RetrieveUserTransactionByNop(string nop, DateTime tglTransaction)
         {
-            return UserTransactionData.RetrieveUserTransactionByMonth(username, monthTransaction, yearTransaction).AsEnumerable<UserTransaction>();
+            return ModelToBusinessModelMapper.Convert<UserTransaction, UserTransactionBusinessDataModel>(_userTransactionBusinessData.RetrieveUserTransactionByNop(nop, tglTransaction));
         }
 
-        public static IEnumerable<UserTransaction> RetrieveUserInformationTransactionByMonth(string username, string nop, int monthTransaction, int yearTransaction)
+        public List<UserTransactionWithJenisPajak> RetrieveUserTransactionBetweenDate(DateTime tglAwal, DateTime tglAkhir)
         {
-            return UserTransactionData.RetrieveUserInformationTransactionByMonth(username, nop, monthTransaction, yearTransaction).AsEnumerable<UserTransaction>();
+            return _userTransactionBusinessData.RetrieveUserTransactionBetweenDate(tglAwal, tglAkhir);
         }
 
-        public static IEnumerable<UserTransaction> RetrieveUserTransactionByMonth(string username, string nop, int monthTransaction, int yearTransaction)
+        public IEnumerable<UserTransactionBusinessDataModel> RetrieveUserTransactionByMonth(string username, int monthTransaction, int yearTransaction)
         {
-            return UserTransactionData.RetrieveUserTransactionByMonth(username, nop, monthTransaction, yearTransaction).AsEnumerable<UserTransaction>();
+            return ModelToBusinessModelMapper.Convert<UserTransaction, UserTransactionBusinessDataModel>(_userTransactionBusinessData.RetrieveUserTransactionByMonth(username, monthTransaction, yearTransaction).ToList());
         }
 
-        public static IEnumerable<UserTransaction> RetrieveUserTransactionByDateTransaction(string nop, DateTime tglTransaksi)
+        public IEnumerable<UserTransactionBusinessDataModel> RetrieveUserInformationTransactionByMonth(string username, string nop, int monthTransaction, int yearTransaction)
         {
-            return UserTransactionData.RetrieveUserTransactionByDateTransaction(nop, tglTransaksi).AsEnumerable<UserTransaction>();
+            return ModelToBusinessModelMapper.Convert<UserTransaction, UserTransactionBusinessDataModel>(_userTransactionBusinessData.RetrieveUserInformationTransactionByMonth(username, nop, monthTransaction, yearTransaction).ToList());
         }
 
-        public static bool UpdatePajakUserTransaction(string username, string nop, DateTime tanggal, double pajak)
+        public IEnumerable<UserTransactionBusinessDataModel> RetrieveUserTransactionByMonth(string username, string nop, int monthTransaction, int yearTransaction)
         {
-            return UserTransactionData.UpdatePajakUserTransaction(username, nop, tanggal, pajak);
+            return ModelToBusinessModelMapper.Convert<UserTransaction, UserTransactionBusinessDataModel>(_userTransactionBusinessData.RetrieveUserTransactionByMonth(username, nop, monthTransaction, yearTransaction).ToList());
         }
 
-        public static IEnumerable<RekapTransaction> RetrieveRekapResultWp(string username)
+        public IEnumerable<UserTransactionBusinessDataModel> RetrieveUserTransactionByDateTransaction(string nop, DateTime tglTransaksi)
         {
-            return UserTransactionData.RetrieveRekapResultWp(username).AsEnumerable<RekapTransaction>();
+            return ModelToBusinessModelMapper.Convert<UserTransaction, UserTransactionBusinessDataModel>(_userTransactionBusinessData.RetrieveUserTransactionByDateTransaction(nop, tglTransaksi).ToList());
         }
 
-        public static IEnumerable<PaymentTransaction> RetrieveDataPayment(string username, int? tahun2)
+        public bool UpdatePajakUserTransaction(string username, string nop, DateTime tanggal, double pajak)
         {
-            return UserTransactionData.RetrieveDataPayment(username, tahun2).AsEnumerable<PaymentTransaction>();
+            return _userTransactionBusinessData.UpdatePajakUserTransaction(username, nop, tanggal, pajak);
         }
 
-        public static IEnumerable<PaymentTransaction> RetrieveDataPayment(string username, int? tahun, int? tahun2)
+        public IEnumerable<RekapTransaction> RetrieveRekapResultWp(string username)
         {
-            string allNop = string.Empty;
-            DataTable dt = new DataTable();
-            dt = UserTransactionData.RetrieveAllNopByUsername(username);
-            if (dt != null && dt.Rows.Count > 0)
-            {
-                foreach (DataRow item in dt.Rows)
-                {
-                    allNop += "'" + item["NOP"].ToString() + "'" + ",";
-                }
-                allNop = allNop.Remove(allNop.Length - 1);
-            }
-            return UserTransactionData.RetrieveDataPayment(allNop, tahun, tahun2).AsEnumerable<PaymentTransaction>();
+            return _userTransactionBusinessData.RetrieveRekapResultWp(username);
         }
 
-        public static IEnumerable<VwGeneratePayment> RetrieveDataPayment(string username, string nop, int month, int year)
+        public IEnumerable<PaymentTransaction> RetrieveDataPayment(string username, int? tahun2)
         {
-            return UserTransactionData.RetrieveDataPayment(username, nop, month, year).AsEnumerable<VwGeneratePayment>();
+            return _userTransactionBusinessData.RetrieveDataPayment(username, tahun2);
         }
 
-        public static IEnumerable<PaymentTransaction> GetChartDataBeforeAdjustment(string username, int year, int year2)
+        public IEnumerable<PaymentTransaction> RetrieveDataPayment(string username, int? tahun, int? tahun2)
         {
-            return UserTransactionData.GetChartDataBeforeAdjustment(username, year, year2).AsEnumerable<PaymentTransaction>();
+            return _userTransactionBusinessData.RetrieveDataPayment(username, tahun, tahun2);
         }
 
-        public static IEnumerable<PaymentTransaction> GetChartDataBeforeAdjustment(string username, int year)
+        public IEnumerable<VwGeneratePayment> RetrieveDataPayment(string username, string nop, int month, int year)
         {
-            return UserTransactionData.GetChartDataBeforeAdjustment(username, year).AsEnumerable<PaymentTransaction>();
+            return _userTransactionBusinessData.RetrieveDataPayment(username, nop, month, year);
+        }
+
+        public IEnumerable<PaymentTransaction> GetChartDataBeforeAdjustment(string username, int year, int year2)
+        {
+            return _userTransactionBusinessData.GetChartDataBeforeAdjustment(username, year, year2);
+        }
+
+        public IEnumerable<PaymentTransaction> GetChartDataBeforeAdjustment(string username, int year)
+        {
+            return _userTransactionBusinessData.GetChartDataBeforeAdjustment(username, year);
         }
     }
 }

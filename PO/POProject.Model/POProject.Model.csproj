@@ -1,0 +1,103 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{CEA4AD70-63E3-4D9F-ADC2-26CE46128C1F}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>POProject.Model</RootNamespace>
+    <AssemblyName>POProject.Model</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BaseEntity.cs" />
+    <Compile Include="DisplayMonitor.cs" />
+    <Compile Include="ExceptionPort.cs" />
+    <Compile Include="GenerateTransaction.cs" />
+    <Compile Include="NopBaru.cs" />
+    <Compile Include="PajakPerekaman.cs" />
+    <Compile Include="PaymentTransaction.cs" />
+    <Compile Include="PureNop.cs" />
+    <Compile Include="RekapTransaction.cs" />
+    <Compile Include="SPTPDDetail.cs" />
+    <Compile Include="SptpdPaymentItem.cs" />
+    <Compile Include="UserApiUrl.cs" />
+    <Compile Include="USERAPP.cs" />
+    <Compile Include="UserDetailWithPajak.cs" />
+    <Compile Include="UserProfile.cs" />
+    <Compile Include="UserSettingDatabase.cs" />
+    <Compile Include="UserTempError.cs" />
+    <Compile Include="UserTransactionWithJenisPajak.cs" />
+    <Compile Include="UserXMLFile.cs" />
+    <Compile Include="AppSettings.cs" />
+    <Compile Include="Bank.cs" />
+    <Compile Include="DatabaseColUsed.cs" />
+    <Compile Include="DataBayarBank.cs" />
+    <Compile Include="DBSettings.cs" />
+    <Compile Include="JatuhTempo.cs" />
+    <Compile Include="JenisPajak.cs" />
+    <Compile Include="MyTable.cs" />
+    <Compile Include="NOP.cs" />
+    <Compile Include="NopPajak.cs" />
+    <Compile Include="Perekaman.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SerialNote.cs" />
+    <Compile Include="Setting.cs" />
+    <Compile Include="settingDBSource.cs" />
+    <Compile Include="SourceDB.cs" />
+    <Compile Include="SPTPD.cs" />
+    <Compile Include="Testimoni.cs" />
+    <Compile Include="UpdateVersion.cs" />
+    <Compile Include="UserActivity.cs" />
+    <Compile Include="UserClient.cs" />
+    <Compile Include="UserNOP.cs" />
+    <Compile Include="UserSettingColumn.cs" />
+    <Compile Include="UserTempSetting.cs" />
+    <Compile Include="UserTransaction.cs" />
+    <Compile Include="UserTransactionDetail.cs" />
+    <Compile Include="VirtualAccountBankItem.cs" />
+    <Compile Include="VwGeneratePayment.cs" />
+    <Compile Include="Year.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

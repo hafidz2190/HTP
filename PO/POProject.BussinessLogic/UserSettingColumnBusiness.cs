@@ -1,72 +1,56 @@
-﻿using POProject.BusinessLogic.Entity;
-using POProject.DataAccess;
+﻿using POProject.BusinessLogic.BusinessData;
+using POProject.Model;
 using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace POProject.BusinessLogic
 {
-    public class UserSettingColumnBusiness
+    public class UserSettingColumnBusiness : IUserSettingColumnBusiness
     {
-        public static List<UserSettingColumn> RetrieveSettingColumnByUsername(string username)
+        private readonly IUserSettingColumnBusinessData _userSettingColumnBusinessData;
+
+        public UserSettingColumnBusiness(IUserSettingColumnBusinessData userSettingColumnBusinessData)
         {
-            return UserSettingColumnData.RetrieveSettingColumn(username).AsEnumerable<UserSettingColumn>().ToList();
+            _userSettingColumnBusinessData = userSettingColumnBusinessData;
         }
 
-        public static List<UserSettingColumn> RetrieveColumnByUserNop(string username, string nop)
+        public List<UserSettingColumn> RetrieveSettingColumnByUsername(string username)
         {
-            DataTable dt = UserSettingColumnData.RetrieveColumnByUserNop(username, nop);
-            return dt.AsEnumerable<UserSettingColumn>().ToList();
+            return _userSettingColumnBusinessData.RetrieveSettingColumnByUsername(username);
         }
 
-        public static List<UserTempSetting> GetUserTempSetting(string teks)
+        public List<UserSettingColumn> RetrieveColumnByUserNop(string username, string nop)
         {
-            return UserSettingColumnData.GetUserTempSetting(teks).AsEnumerable<UserTempSetting>().ToList();
+            return _userSettingColumnBusinessData.RetrieveColumnByUserNop(username, nop);
         }
 
-        public static List<string> RetrieveAllUser()
+        public List<UserTempSetting> GetUserTempSetting(string teks)
         {
-            List<string> lstUsr = new List<string>();
-            DataTable dtUser = new DataTable();
-            dtUser = UserSettingColumnData.RetrieveAllUser();
-            if (dtUser != null && dtUser.Rows.Count > 0)
-            {
-                Parallel.ForEach(dtUser.AsEnumerable(), dRow =>
-                {
-                    lstUsr.Add(dRow["USERNAME"].ToString());
-                });
-
-            }
-
-            return lstUsr;
+            return _userSettingColumnBusinessData.GetUserTempSetting(teks);
         }
 
-        public static bool IsSerialFound(string serialKey)
+        public List<string> RetrieveAllUser()
         {
-            return UserSettingColumnData.GetSerialKey(serialKey);
+            return _userSettingColumnBusinessData.RetrieveAllUser();
         }
 
-        public static bool RegisterSerialKey(string user, string key, string serialKey)
+        public bool IsSerialFound(string serialKey)
         {
-            return UserSettingColumnData.RegisterSerialKey(user, key, serialKey);
+            return _userSettingColumnBusinessData.IsSerialFound(serialKey);
         }
 
-        public static List<JenisPajak> RetrieveTarifAll()
+        public bool RegisterSerialKey(string user, string key, string serialKey)
         {
-            return UserSettingColumnData.RetrieveTarifAll().AsEnumerable<JenisPajak>().ToList();
+            return _userSettingColumnBusinessData.RegisterSerialKey(user, key, serialKey);
         }
 
-        public static List<queryData> RetrieveQueryPajak(string username, string nop)
+        public List<JenisPajak> RetrieveTarifAll()
         {
-            return UserSettingColumnData.RetrieveQueryPajak(username, nop).AsEnumerable<queryData>().ToList();
+            return _userSettingColumnBusinessData.RetrieveTarifAll();
         }
-    }
 
-    public class queryData
-    {
-        public string nop { get; set; }
-        public string queryPajak { get; set; }
-        public string queryLampiran { get; set; }
+        public List<queryData> RetrieveQueryPajak(string username, string nop)
+        {
+            return _userSettingColumnBusinessData.RetrieveQueryPajak(username, nop);
+        }
     }
 }

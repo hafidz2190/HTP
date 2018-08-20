@@ -4,7 +4,7 @@ using Nancy.Extensions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using POProject.BusinessLogic;
-using POProject.BusinessLogic.Entity;
+using POProject.Model;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -17,15 +17,31 @@ namespace POProject.API.Module
     public class DevModule : NancyModule
     {
         private static readonly ILog log = LogManager.GetLogger(typeof(DevModule));
-        public DevModule()
+        private readonly IJatuhTempoBusiness _jatuhTempoBusiness;
+        private readonly ISettingClientBusiness _settingClientBusiness;
+        private readonly ISPTPDDetailBusiness _sPTPDDetailBusiness;
+        private readonly IUserActivityBusiness _userActivityBusiness;
+        private readonly IUserSettingColumnBusiness _userSettingColumnBusiness;
+        private readonly IUserTransactionBusiness _userTransactionBusiness;
+        private readonly IUserTransactionDetailBusiness _userTransactionDetailBusiness;
+
+        public DevModule(IJatuhTempoBusiness jatuhTempoBusiness, ISettingClientBusiness settingClientBusiness, ISPTPDDetailBusiness sPTPDDetailBusiness, IUserActivityBusiness userActivityBusiness, IUserSettingColumnBusiness userSettingColumnBusiness, IUserTransactionBusiness userTransactionBusiness, IUserTransactionDetailBusiness userTransactionDetailBusiness)
         {
+            _jatuhTempoBusiness = jatuhTempoBusiness;
+            _settingClientBusiness = settingClientBusiness;
+            _sPTPDDetailBusiness = sPTPDDetailBusiness;
+            _userActivityBusiness = userActivityBusiness;
+            _userSettingColumnBusiness = userSettingColumnBusiness;
+            _userTransactionBusiness = userTransactionBusiness;
+            _userTransactionDetailBusiness = userTransactionDetailBusiness;
+
             Get["/testConnection"] = parameter =>
             {
                 var jsonBody = string.Empty;
                 try
                 {
                     List<ExceptionPort> listPort = new List<ExceptionPort>();
-                    listPort = SettingClientBusiness.RetrievePortException();
+                    listPort = _settingClientBusiness.RetrievePortException();
                     log.Debug("Get list port");
                     jsonBody = JsonConvert.SerializeObject(listPort);
                     log.Debug("Connection Success");
@@ -45,7 +61,7 @@ namespace POProject.API.Module
                 List<string> lstUsr = new List<string>();
                 try
                 {
-                    lstUsr = UserSettingColumnBusiness.RetrieveAllUser();
+                    lstUsr = _userSettingColumnBusiness.RetrieveAllUser();
                     log.Debug("Get User Success");
                 }
                 catch (Exception ex)
@@ -65,7 +81,7 @@ namespace POProject.API.Module
                 try
                 {
                     string body = Nancy.IO.RequestStream.FromStream(Request.Body).AsString();
-                    bool isFound = UserSettingColumnBusiness.IsSerialFound(body);
+                    bool isFound = _userSettingColumnBusiness.IsSerialFound(body);
                     if (isFound)
                     {
                         log.Debug("Serial is found");
@@ -90,7 +106,7 @@ namespace POProject.API.Module
             {
                 log.Debug("Start:/dev/GetUrlApi");
                 string urlApi = string.Empty;
-                urlApi = UserActivityBusiness.GetUrlApi();
+                urlApi = _userActivityBusiness.GetUrlApi();
                 try
                 {
                     var jsonBody = JsonConvert.SerializeObject(urlApi);
@@ -110,7 +126,7 @@ namespace POProject.API.Module
                 try
                 {
                     //Get All Tarif Pajak
-                    lstPajak = UserSettingColumnBusiness.RetrieveTarifAll();
+                    lstPajak = _userSettingColumnBusiness.RetrieveTarifAll();
                     log.Debug("Get tarif pajak success");
                 }
                 catch (Exception ex)
@@ -136,7 +152,7 @@ namespace POProject.API.Module
                     LastErrorResponse resp = new LastErrorResponse();
                     resp.TanggalError = DateTime.Now.Date;
 
-                    resp.TanggalError = UserActivityBusiness.GetLastErrorDate(setting);
+                    resp.TanggalError = _userActivityBusiness.GetLastErrorDate(setting);
 
                     var jsonBody = JsonConvert.SerializeObject(resp);
                     log.Info("End : /dev/postLastErrorDate");
@@ -165,22 +181,22 @@ namespace POProject.API.Module
                     string username = string.Empty;
                     foreach (var item in setting.list_user)
                     {
-                        SettingClientBusiness.InsertUserClient(item.userName, item.idMachine, item.guid, item.phone, item.mail, item.port);
+                        _settingClientBusiness.InsertUserClient(item.userName, item.idMachine, item.guid, item.phone, item.mail, item.port);
                         username = item.userName;
                     }
                     foreach (var item in setting.list_nop)
                     {
-                        SettingClientBusiness.InsertUserNop(username, item.nop, item.jenisPajak);
+                        _settingClientBusiness.InsertUserNop(username, item.nop, item.jenisPajak);
                     }
 
                     foreach (var item in setting.settings)
                     {
-                        SettingClientBusiness.InsertUserSettingColumn(username, item.nop, item.column_name, item.column_text);
+                        _settingClientBusiness.InsertUserSettingColumn(username, item.nop, item.column_name, item.column_text);
                     }
                     #endregion
 
                     //insert xmlcontent
-                    SettingClientBusiness.InsertXmlFile(username, "setUpload.xml", setting.xml_content, setting.jenFile, setting.separator);
+                    _settingClientBusiness.InsertXmlFile(username, "setUpload.xml", setting.xml_content, setting.jenFile, setting.separator);
 
                     log.Info("End : /dev/postSettingClient");
                     return Response.AsJson(new { code = HttpStatusCode.OK });
@@ -207,11 +223,11 @@ namespace POProject.API.Module
                     if (user != null)
                     {
                         log.Info("Checking user exist");
-                        UserClient userClient = SettingClientBusiness.RetrieveUserClient(user.userName, user.idMachine, user.guid).FirstOrDefault();
+                        UserClient userClient = _settingClientBusiness.RetrieveUserClient(user.userName, user.idMachine, user.guid).FirstOrDefault();
                         if (userClient != null)
                         {
                             log.Info("Retrieve data setting client from database");
-                            List<UserSettingColumn> listSettingColumn = UserSettingColumnBusiness.RetrieveSettingColumnByUsername(userClient.Username);
+                            List<UserSettingColumn> listSettingColumn = _userSettingColumnBusiness.RetrieveSettingColumnByUsername(userClient.Username);
                             log.Info("Serialize data to json");
                             var jsonBody = JsonConvert.SerializeObject(listSettingColumn);
                             log.Info("End : /dev/postSettingClientWithParam");
@@ -275,7 +291,7 @@ namespace POProject.API.Module
                         dtLampiran = dtTransaksi.Copy();
 
                     List<UserSettingColumn> lstColumnName = new List<UserSettingColumn>();
-                    lstColumnName = SettingClientBusiness.RetrieveUserSettingColumn(username, dtLampiran.Rows[0]["NOP"].ToString());
+                    lstColumnName = _settingClientBusiness.RetrieveUserSettingColumn(username, dtLampiran.Rows[0]["NOP"].ToString());
                     string teksTanggal = lstColumnName.Where(m => m.Column_Name.ToUpper().Equals("TGL_TRANSAKSI")).Select(m => m.Column_Text).FirstOrDefault();
                     if (string.IsNullOrEmpty(teksTanggal))
                         teksTanggal = "TGL_TRANSAKSI";
@@ -321,7 +337,7 @@ namespace POProject.API.Module
                         //Validate Query
                         if (isFromDatabase)
                         {
-                            List<BusinessLogic.queryData> queryLst = UserSettingColumnBusiness.RetrieveQueryPajak(username, nop);
+                            List<BusinessLogic.queryData> queryLst = _userSettingColumnBusiness.RetrieveQueryPajak(username, nop);
                             if (queryLst != null && queryLst.Count > 0)
                             {
                                 bool isQueryValid = true;
@@ -345,7 +361,7 @@ namespace POProject.API.Module
                                 {
                                     //insert tanggal_error into user_temp_error
                                     DateTime dtmlastTime = dtTransaksi.AsEnumerable().Select(x => x.Field<DateTime>("TGL_TRANSAKSI")).FirstOrDefault();
-                                    UserActivityBusiness.InsertUserActivity(username, ip, DateTime.Now, true, "Query tidak sesuai");
+                                    _userActivityBusiness.InsertUserActivity(username, ip, DateTime.Now, true, "Query tidak sesuai");
                                     log.Info("Query tidak sesuai, mohon periksa kembali. ............");
                                     return Response.AsJson(new { code = HttpStatusCode.InternalServerError, message = $"Error, Query tidak sesuai, mohon periksa kembali." });
                                 }
@@ -363,7 +379,7 @@ namespace POProject.API.Module
                         string namaKolomTanggal = string.Empty;
                         if (!isFromDatabase)
                         {
-                            lstKolomName = UserSettingColumnBusiness.RetrieveColumnByUserNop(username, nop);
+                            lstKolomName = _userSettingColumnBusiness.RetrieveColumnByUserNop(username, nop);
                         }
                         else
                         {
@@ -407,7 +423,7 @@ namespace POProject.API.Module
                                 if (oldMP != mp)
                                 {
                                     if (oldThn != thn)
-                                        isOnDetail = SPTPDDetailBusiness.isSptpdDetailByNop(dRow["NOP"].ToString(), mp, thn);
+                                        isOnDetail = _sPTPDDetailBusiness.isSptpdDetailByNop(dRow["NOP"].ToString(), mp, thn);
                                 }
                                 oldNop = dRow["NOP"].ToString();
                                 oldMP = mp;
@@ -501,8 +517,7 @@ namespace POProject.API.Module
                         log.Info("inserting data to user transaction");
                         //cek transaction isExist
                         IEnumerable<UserTransaction> lstTransExist = new List<UserTransaction>();
-                        lstTransExist = UserTransactionBusiness.RetrieveUserTransactionByMonth(username, lstTransaksi.FirstOrDefault().tanggal.Month,
-                            lstTransaksi.FirstOrDefault().tanggal.Year);
+                        lstTransExist = _userTransactionBusiness.RetrieveUserTransactionByMonth(username, lstTransaksi.FirstOrDefault().tanggal.Month, lstTransaksi.FirstOrDefault().tanggal.Year);
 
                         //insert into user_transaction
                         foreach (var item in lstTransaksi)
@@ -514,12 +529,12 @@ namespace POProject.API.Module
                                 if (isExist)
                                 {
                                     log.Info("update data from user " + username);
-                                    UserTransactionBusiness.UpdatePajakUserTransaction(username, nop, item.tanggal, item.total);
+                                    _userTransactionBusiness.UpdatePajakUserTransaction(username, nop, item.tanggal, item.total);
                                 }
                                 else
                                 {
                                     log.Info("insert data from user " + username);
-                                    UserTransactionBusiness.InsertUserTransaction(username, item.tanggal, item.total, ip, string.Empty, false, nop);
+                                    _userTransactionBusiness.InsertUserTransaction(username, item.tanggal, item.total, ip, string.Empty, false, nop);
                                 }
                             }
                             catch (Exception ex)
@@ -535,7 +550,7 @@ namespace POProject.API.Module
                         //Replace nama kolom untuk no_invoice dan tgl_transaksi
                         if (!isFromDatabase)
                         {
-                            List<UserSettingColumn> lstSetCol = SettingClientBusiness.RetrieveUserSettingColumn(username, nop);
+                            List<UserSettingColumn> lstSetCol = _settingClientBusiness.RetrieveUserSettingColumn(username, nop);
                             string noInvoice = lstSetCol.Where(x => x.Column_Name.ToUpper().Equals("NO_INVOICE")).Select(x => x.Column_Text.ToUpper()).FirstOrDefault();
                             string tglTransaksi = lstSetCol.Where(x => x.Column_Name.ToUpper().Equals("TGL_TRANSAKSI")).Select(x => x.Column_Text.ToUpper()).FirstOrDefault();
 
@@ -656,16 +671,17 @@ namespace POProject.API.Module
                             bool isDetailExist = false;
                             try
                             {
-                                List<UserTransactionDetail> lstDetail = UserTransactionDetailBusiness.RetrieveUserDetailTransactionByDateTransaction(nop, tglTrans).ToList();
+                                //todo delete 1 row below List<UserTransactionDetail> lstDetail = UserTransactionDetailBusiness.RetrieveUserDetailTransactionByDateTransaction(nop, tglTrans).ToList();
+                                List<UserTransactionDetail> lstDetail = null;
                                 if (lstDetail != null && lstDetail.Count > 0)
                                     isDetailExist = true;
 
                                 //Delete if username, nop, bulan and tahun is exist
                                 if (isDetailExist)
-                                    UserTransactionDetailBusiness.DeleteUserDetailTransaction(nop, tglTrans);
+                                    _userTransactionDetailBusiness.DeleteUserDetailTransaction(nop, tglTrans);
 
                                 // insert Trasaction Detail
-                                UserTransactionDetailBusiness.InsertUserTransactionDetail(username, dir, bulan.AsInt32(), tahun.AsInt32(), tglTrans, ip, xmlString, nop);
+                                _userTransactionDetailBusiness.InsertUserTransactionDetail(username, dir, bulan.AsInt32(), tahun.AsInt32(), tglTrans, ip, xmlString, nop);
                             }
                             catch (Exception ex)
                             {
@@ -755,7 +771,7 @@ namespace POProject.API.Module
                             if (string.IsNullOrEmpty(userActivity.IPClient))
                                 ipClient = ip;
 
-                            UserActivityBusiness.InsertUserActivity(userActivity.Username, ipClient, dateNow, status, userActivity.Keterangan);
+                            _userActivityBusiness.InsertUserActivity(userActivity.Username, ipClient, dateNow, status, userActivity.Keterangan);
                             var jsonBody = JsonConvert.SerializeObject(dateNow, Formatting.None, new IsoDateTimeConverter() { DateTimeFormat = "yyyy-MM-dd hh:mm:ss" });
 
                             log.Info("End : /dev/postUserActivity");
@@ -802,7 +818,7 @@ namespace POProject.API.Module
                         username = username.Remove(username.Length - 1);
                     }
 
-                    List<UserClient> lstUsr = SettingClientBusiness.RetrieveUserClient(username);
+                    List<UserClient> lstUsr = _settingClientBusiness.RetrieveUserClient(username);
                     if (lstUsr != null && lstUsr.Count > 0)
                         cpuId = lstUsr.FirstOrDefault().Id_Machine;
 
@@ -831,7 +847,7 @@ namespace POProject.API.Module
                     string tanggal = string.Empty;
                     if (dueDate != null)
                     {
-                        JatuhTempo jthTempo = JatuhTempoBusiness.RetrieveJatuhTempo(dueDate.masapajak.AsInt32(), dueDate.tahunpajak.AsInt32());
+                        JatuhTempo jthTempo = _jatuhTempoBusiness.RetrieveJatuhTempo(dueDate.masapajak.AsInt32(), dueDate.tahunpajak.AsInt32());
                         if (jthTempo != null)
                         {
                             tanggal = jthTempo.Tgl_Jatuh_Tempo.ToString("dd/MM/yyyy");

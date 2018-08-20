@@ -37,6 +37,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SignalRClient", "SignalRCli
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SignalRClientJS", "SignalRClientJS\SignalRClientJS.csproj", "{810289E7-C5A8-4AA0-9BC8-6DA489C33BE0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestEF", "TestEF\TestEF.csproj", "{F9BC2362-7050-419C-A9B8-E8C266D3C120}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "POProject.Builder", "POProject.Builder\POProject.Builder.csproj", "{74B2A367-EB55-4A54-A4A3-A6E87528DE70}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "POProject.Model", "POProject.Model\POProject.Model.csproj", "{CEA4AD70-63E3-4D9F-ADC2-26CE46128C1F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -111,11 +117,24 @@ Global
 		{810289E7-C5A8-4AA0-9BC8-6DA489C33BE0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{810289E7-C5A8-4AA0-9BC8-6DA489C33BE0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{810289E7-C5A8-4AA0-9BC8-6DA489C33BE0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F9BC2362-7050-419C-A9B8-E8C266D3C120}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F9BC2362-7050-419C-A9B8-E8C266D3C120}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F9BC2362-7050-419C-A9B8-E8C266D3C120}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F9BC2362-7050-419C-A9B8-E8C266D3C120}.Release|Any CPU.Build.0 = Release|Any CPU
+		{74B2A367-EB55-4A54-A4A3-A6E87528DE70}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{74B2A367-EB55-4A54-A4A3-A6E87528DE70}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{74B2A367-EB55-4A54-A4A3-A6E87528DE70}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{74B2A367-EB55-4A54-A4A3-A6E87528DE70}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CEA4AD70-63E3-4D9F-ADC2-26CE46128C1F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CEA4AD70-63E3-4D9F-ADC2-26CE46128C1F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CEA4AD70-63E3-4D9F-ADC2-26CE46128C1F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CEA4AD70-63E3-4D9F-ADC2-26CE46128C1F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
+		EnterpriseLibraryConfigurationToolBinariesPath = packages\Unity.2.1.505.0\lib\NET35
 		SolutionGuid = {9B71512B-A541-4753-8990-95A30703A4C4}
 	EndGlobalSection
 EndGlobal

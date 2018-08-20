@@ -43,31 +43,4 @@ namespace POProject.BusinessLogic
             return SPTPDBonangData.GetNamaOPSptpd(kdValidasi);
         }
     }
-    public class SPTPDDetailBusiness
-    {
-        public static List<SPTPDDetail> RetrieveDetailSptpd(string idSptpd, string username)
-        {
-            return SPTPDDetailData.RetrieveDetailSptpd(idSptpd, username).AsEnumerable<SPTPDDetail>().ToList();
-        }
-
-        public static List<SPTPDDetail> RetrieveDetailSptpdByNop(string idSptpd, string nop)
-        {
-            return SPTPDDetailData.RetrieveDetailSptpdByNop(idSptpd, nop).AsEnumerable<SPTPDDetail>().ToList();
-        }
-
-        public static bool InsertDetailSptpd(string idsptpd, string nop, string username, int masapajak, int tahun, double pajak)
-        {
-            return SPTPDDetailData.InsertDetailSptpd(idsptpd, nop, username, masapajak, tahun, pajak);
-        }
-
-        public static bool UpdateIsGenerate(string nop, DateTime tanggal)
-        {
-            return SPTPDDetailData.UpdateIsGenerate(nop, tanggal);
-        }
-
-        public static bool isSptpdDetailByNop(string nop, int masapajak, int tahun)
-        {
-            return SPTPDDetailData.isSptpdDetailByNop(nop, masapajak, tahun);
-        }
-    }
 }

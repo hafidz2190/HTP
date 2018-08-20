@@ -1,4 +1,5 @@
-﻿using System;
+﻿using POProject.DataAccess;
+using System;
 
 namespace POProject.BusinessLogic.Entity
 {
@@ -71,7 +72,7 @@ namespace POProject.BusinessLogic.Entity
         {
             get
             {
-                return UserTransactionDetailBusiness.GetXmlFileByNop(NOP, Bulan, Tahun);
+                return UserTransactionDetailData.GetXmlFileByNop(NOP, Bulan, Tahun);
             }
         }
         public int Bulan { get; set; }

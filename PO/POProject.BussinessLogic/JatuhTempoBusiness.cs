@@ -1,28 +1,36 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using POProject.BusinessLogic.BusinessData;
+using POProject.Model;
+using System.Collections.Generic;
 
 namespace POProject.BusinessLogic
 {
-    public class JatuhTempoBusiness
+    public class JatuhTempoBusiness : IJatuhTempoBusiness
     {
-        public static Entity.JatuhTempo RetrieveJatuhTempo(int masapajak, int tahunpajak)
+        private readonly IJatuhTempoBusinessData _jatuhTempoBusinessData;
+
+        public JatuhTempoBusiness(IJatuhTempoBusinessData jatuhTempoBusinessData)
         {
-            return DataAccess.JatuhTempoData.RetrieveJatuhTempo(masapajak, tahunpajak).AsEnumerable<Entity.JatuhTempo>().FirstOrDefault();
+            _jatuhTempoBusinessData = jatuhTempoBusinessData;
         }
 
-        public static List<Entity.JatuhTempo> RetrieveAllJatuhTempo(int tahun)
+        public JatuhTempo RetrieveJatuhTempo(int masapajak, int tahunpajak)
         {
-            return DataAccess.JatuhTempoData.RetrieveAllJatuhTempo(tahun).AsEnumerable<Entity.JatuhTempo>().ToList();
+            return _jatuhTempoBusinessData.RetrieveJatuhTempo(masapajak, tahunpajak);
         }
 
-        public static List<Entity.Year> RetrieveTahunJatuhTempo()
+        public List<JatuhTempo> RetrieveAllJatuhTempo(int tahun)
         {
-            return DataAccess.JatuhTempoData.RetrieveTahunJatuhTempo().AsEnumerable<Entity.Year>().ToList();
+            return _jatuhTempoBusinessData.RetrieveAllJatuhTempo(tahun);
         }
 
-        public static List<Entity.JatuhTempo> RetrieveAllowMasaPajak()
+        public List<Year> RetrieveTahunJatuhTempo()
         {
-            return DataAccess.JatuhTempoData.RetrieveAllowMasaPajak().AsEnumerable<Entity.JatuhTempo>().ToList();
+            return _jatuhTempoBusinessData.RetrieveTahunJatuhTempo();
+        }
+
+        public List<JatuhTempo> RetrieveAllowMasaPajak()
+        {
+            return _jatuhTempoBusinessData.RetrieveAllowMasaPajak();
         }
     }
 }

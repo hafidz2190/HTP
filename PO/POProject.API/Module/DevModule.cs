@@ -456,7 +456,7 @@ namespace POProject.API.Module
                             }
                             catch (Exception ex)
                             {
-
+                                throw ex;
                             }
 
                             if (tglOld.Year == 1)

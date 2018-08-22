@@ -83,7 +83,7 @@ namespace POFtpSender
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 tbKeterangan.Text = sbMessage.ToString();
                 _isSukses = false;
@@ -156,7 +156,7 @@ namespace POFtpSender
                 //register serial key(REGISTERED MODE)
                 ClassHelper.GenerateSerialFile("REGISTERED", tbSerialNo.Text);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 StringBuilder sbMessage = new StringBuilder();
                 sbMessage.AppendLine("Kode Registrasi Tidak Valid");

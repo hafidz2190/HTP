@@ -113,9 +113,8 @@ namespace POProject.DataAccess
             {
                 jml = Convert.ToInt32(cmd.ExecuteScalar());
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-
             }
 
             return jml > 0;

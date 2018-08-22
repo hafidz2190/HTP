@@ -131,7 +131,7 @@ namespace POFtpSender
                 response.Close();
                 _isSukses = true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 //Temporary skip download if failed
                 _isSukses = false;

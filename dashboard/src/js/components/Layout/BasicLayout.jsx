@@ -2,13 +2,15 @@ import React from 'react';
 import { Layout, Breadcrumb, Icon } from 'antd';
 import { Route } from "react-router-dom";
 
-import SideMenu from './SideMenu';
-import DashboardHeader from './DashboardHeader';
-import DashboardPage from './DashboardPage';
-import ProfilePage from './ProfilePage';
-import InformationPage from './InformationPage';
-import AdjustmentPage from './AdjustmentPage';
-import GeneratePaymentPage from './GeneratePaymentPage';
+import SideMenu from '../SideMenu';
+import DashboardHeader from '../DashboardHeader';
+import DashboardPage from '../DashboardPage';
+import ProfilePage from '../ProfilePage';
+import InformationPage from '../InformationPage';
+import AdjustmentPage from '../AdjustmentPage';
+import GeneratePaymentPage from '../GeneratePaymentPage';
+
+import './index.css';
 
 const { Header, Content, Footer, Sider } = Layout;
 

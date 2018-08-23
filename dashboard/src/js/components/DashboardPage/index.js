@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import { Select, Button } from 'antd';
 import TransactionChart from './TransactionChart';
 import TransactionTable from './TransactionTable';
-import './index.css';
 
 const Option = Select.Option;
 

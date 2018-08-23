@@ -1,5 +1,5 @@
 import React from 'react';
-import { Layout, Breadcrumb } from 'antd';
+import { Layout, Breadcrumb, Icon } from 'antd';
 import { Route } from "react-router-dom";
 
 import SideMenu from './SideMenu';
@@ -38,10 +38,13 @@ export default class BasicLayout extends React.Component {
             <div className="logo" />
             <SideMenu />
           </Sider>
-          <Content style={{ margin: '0 16px' }}>
+          <Content style={{ margin: '0 0px' }}>
             <Breadcrumb style={{ margin: '16px 0' }}>
-              <Breadcrumb.Item>User</Breadcrumb.Item>
-              <Breadcrumb.Item>Hendi</Breadcrumb.Item>
+              <Breadcrumb.Item>
+                <Icon type="home" style={{ marginRight: '5px' }} />
+                Home
+              </Breadcrumb.Item>
+              <Breadcrumb.Item>Dashboard</Breadcrumb.Item>
             </Breadcrumb>
             <div style={{ padding: 24, background: '#fff', minHeight: 360 }}>
               <Route exact path="/" component={DashboardPage} />

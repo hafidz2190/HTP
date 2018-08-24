@@ -1,8 +1,10 @@
 ﻿using log4net;
+using Microsoft.Practices.Unity;
 using Nancy;
 using Nancy.Hosting.Self;
 using POProject.API.SignalR.Builder;
 using POProject.API.SignalR.Utilities;
+using POProject.Builder;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -12,9 +14,20 @@ namespace POProject.API
     public class Program : NancyModule
     {
         private static readonly ILog log = LogManager.GetLogger(typeof(Program));
+
         static void Main()
         {
             log.Info("Entering Application");
+
+            IUnityContainer container = new UnityContainer();
+            IDictionary<string, object> mainOjectMap;
+
+            MainObjectBuilder mainObjectBuilder = new MainObjectBuilder(container);
+            mainOjectMap = mainObjectBuilder.BuildMainObject();
+
+            AutoMapBuilder autoMapBuilder = new AutoMapBuilder();
+            autoMapBuilder.BuildAutoMap();
+
             HostConfiguration config = new HostConfiguration
             {
                 UrlReservations = { CreateAutomatically = true }
@@ -22,7 +35,16 @@ namespace POProject.API
 
             log.Info("Open Connection to Server");
             Uri uri = new Uri("http://localhost:2202");
-            var host = new NancyHost(config, uri);
+            NancyHost host;
+
+            try
+            {
+                host = new NancyHost(new CustomNancyBootstrapper(container), config, uri);
+            }
+            catch(Exception e)
+            {
+                throw e;
+            }
 
             var signalRHostBaseAddress = "http://+:8885";
             SignalRHost<Startup> signalRHost = SignalRHostBuilder<Startup>.BuildSignalRHost(signalRHostBaseAddress);

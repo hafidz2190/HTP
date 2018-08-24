@@ -1,18 +1,23 @@
-﻿using POProject.BusinessLogic.Entity;
+﻿using POProject.BusinessLogic.BusinessData;
 using POProject.DataAccess;
-using System;
+using POProject.Model;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace POProject.BusinessLogic
 {
-    public class UpdateVersionBusiness
+    public class UpdateVersionBusiness : IUpdateVersionBusiness
     {
-        public static List<UpdateVersion> GetVersion()
+        private readonly IUpdateVersionBusinessData _updateVersionBusinessData;
+
+        public UpdateVersionBusiness(IUpdateVersionBusinessData updateVersionBusinessData)
         {
-            return UpdateVersionData.GetVersion().AsEnumerable<UpdateVersion>().ToList();
+            _updateVersionBusinessData = updateVersionBusinessData;
+        }
+
+        public List<UpdateVersion> GetVersion()
+        {
+            return _updateVersionBusinessData.GetVersion();
         }
     }
 }

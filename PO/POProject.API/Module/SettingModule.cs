@@ -6,23 +6,32 @@ using Nancy;
 using Nancy.Extensions;
 using Newtonsoft.Json;
 using POProject.BusinessLogic;
-using POProject.BusinessLogic.Entity;
 using System.Data;
+using POProject.Model;
+using POProject.BusinessLogic.BusinessDataModel;
 
 namespace POProject.API.Module
 {
     public class SettingModule : NancyModule
     {
-        private static readonly ILog log = LogManager.GetLogger(typeof(DevModule));
-        public SettingModule()
+        private static readonly ILog log = LogManager.GetLogger(typeof(SettingModule));
+        private readonly ISerialNoteBusiness _serialNoteBusiness;
+        private readonly ISettingClientBusiness _settingClientBusiness;
+        private readonly IUserSettingColumnBusiness _userSettingColumnBusiness;
+
+        public SettingModule(ISerialNoteBusiness serialNoteBusiness, ISettingClientBusiness settingClientBusiness, IUserSettingColumnBusiness userSettingColumnBusiness)
         {
+            _serialNoteBusiness = serialNoteBusiness;
+            _settingClientBusiness = settingClientBusiness;
+            _userSettingColumnBusiness = userSettingColumnBusiness;
+
             Get["/setting/getTime"] = parameter =>
             {
                 log.Debug("Start:/setting/getTime");
                 List<UserTempSetting> timeSetting = new List<UserTempSetting>();
                 try
                 {
-                    timeSetting = UserSettingColumnBusiness.GetUserTempSetting("JAM SETTING");
+                    timeSetting = _userSettingColumnBusiness.GetUserTempSetting("JAM SETTING");
                     log.Debug("Get Time Success");
                 }
                 catch (Exception ex)
@@ -46,7 +55,7 @@ namespace POProject.API.Module
                     log.Info("Deserialize object from json body");
                     RegisterSerialKey user = JsonConvert.DeserializeObject<RegisterSerialKey>(body);
 
-                    UserSettingColumnBusiness.RegisterSerialKey(user.userName, user.key, user.serialKey);
+                    _userSettingColumnBusiness.RegisterSerialKey(user.userName, user.key, user.serialKey);
 
                     return Response.AsJson(new { code = HttpStatusCode.OK });
                 }
@@ -70,7 +79,7 @@ namespace POProject.API.Module
 
                     #region Get Unused Serial Key
                     log.Info("Get Unused Serial Key");
-                    List<SerialNote> listAvailableSerialNote = SerialNoteBusiness.RetrieveAvailableSerialNote();
+                    List<SerialNoteBusinessDataModel> listAvailableSerialNote = _serialNoteBusiness.RetrieveAvailableSerialNote();
                     #endregion
 
                     #region Compare Serial Key
@@ -82,7 +91,7 @@ namespace POProject.API.Module
                         log.Info("End : /setting/online_register_serialKey");
 
                         //TODO: change value username and HW ID ok tambah parameter y
-                        SerialNoteBusiness.UpdateData(note.Kode, setting.username, setting.HWId);
+                        _serialNoteBusiness.UpdateData(note.Kode, setting.username, setting.HWId);
 
                         return Response.AsJson(new { message = "Valid" });
                     }
@@ -112,7 +121,7 @@ namespace POProject.API.Module
                     log.Info("Deserialize object from json body");
                     var jsonBody = JsonConvert.DeserializeObject<SerialRequest>(body);
 
-                    SettingClientBusiness.UpdateSerialKey(jsonBody.username, jsonBody.serialKey);
+                    _settingClientBusiness.UpdateSerialKey(jsonBody.username, jsonBody.serialKey);
 
                     return Response.AsJson(new { code = HttpStatusCode.OK, message = "Serial key berhasil" });
                 }
@@ -132,10 +141,10 @@ namespace POProject.API.Module
                     log.Info("Deserialize object from json body");
                     var jsonBody = JsonConvert.DeserializeObject<CheckSerialKeyRequest>(body);
 
-                    bool isFound = SettingClientBusiness.IsSerialKeyExist(jsonBody.serialKey, jsonBody.username, jsonBody.cpuId);
+                    bool isFound = _settingClientBusiness.IsSerialKeyExist(jsonBody.serialKey, jsonBody.username, jsonBody.cpuId);
                     if (!isFound)
                     {
-                        List<SerialNote> takenSerial = SerialNoteBusiness.RetrieveTakenSerialNote();
+                        List<SerialNoteBusinessDataModel> takenSerial = _serialNoteBusiness.RetrieveTakenSerialNote();
                         if (takenSerial.Where(s => s.Dec_Kode == jsonBody.serialKey && s.Dec_Taken_Username == jsonBody.username && s.Dec_Taken_HW_ID == jsonBody.cpuId).FirstOrDefault() != null)
                         {
                             isFound = true;
@@ -166,7 +175,8 @@ namespace POProject.API.Module
                     var body = Nancy.IO.RequestStream.FromStream(Request.Body).AsString();
                     log.Info("Deserialize object from json body");
                     SourceDBRequest source = JsonConvert.DeserializeObject<SourceDBRequest>(body);
-                    List<settingDBSource> lstSource = SettingClientBusiness.RetrieveSourceDB(source.username);
+                    //todo delete 1 row below List<settingDBSource> lstSource = _settingClientBusiness.RetrieveSourceDB(source.username);
+                    List<settingDBSource> lstSource = null;
 
                     log.Info("Serialize json from body");
                     var jsonBody = JsonConvert.SerializeObject(lstSource);
@@ -198,17 +208,17 @@ namespace POProject.API.Module
                     if (lstSetDB != null && lstUser != null)
                     {
                         log.Info("Inserting user client ............");
-                        SettingClientBusiness.InsertUserClient(lstUser.FirstOrDefault().userName, lstUser.FirstOrDefault().idMachine, lstUser.FirstOrDefault().guid,
+                        _settingClientBusiness.InsertUserClient(lstUser.FirstOrDefault().userName, lstUser.FirstOrDefault().idMachine, lstUser.FirstOrDefault().guid,
                             lstUser.FirstOrDefault().phone, lstUser.FirstOrDefault().mail, lstUser.FirstOrDefault().port);
-                        SettingClientBusiness.InsertXmlFile(lstUser.FirstOrDefault().userName, "setDB.xml", lstSetDB.FirstOrDefault().xml_content, "DATABASE", "");
+                        _settingClientBusiness.InsertXmlFile(lstUser.FirstOrDefault().userName, "setDB.xml", lstSetDB.FirstOrDefault().xml_content, "DATABASE", "");
                         log.Info("Inserting user nop, user setting db, user source db ............");
                         foreach (var item in lstSetDB)
                         {
                             foreach (var itemSetting in item.LstNop)
                             {
                                 string username = lstUser.FirstOrDefault().userName;
-                                if (!SettingClientBusiness.isUserNopExist(username, itemSetting.Nop))
-                                    SettingClientBusiness.InsertUserNop(username, itemSetting.Nop, itemSetting.JenisPajak);
+                                if (!_settingClientBusiness.isUserNopExist(username, itemSetting.Nop))
+                                    _settingClientBusiness.InsertUserNop(username, itemSetting.Nop, itemSetting.JenisPajak);
                                 string dir = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "sourceDB.xml");
                                 DataSet ds = new DataSet();
                                 ds.Tables.Add(item.lstSourceDB.ToDataTable());
@@ -216,9 +226,9 @@ namespace POProject.API.Module
 
                                 string xmlSettDB = System.IO.File.ReadAllText(dir);
                                 //insert into user_source_db                                
-                                SettingClientBusiness.InsertUserSourceDatabase(username, itemSetting.Nop, xmlSettDB, ipRequest, item.NamaDB);
+                                _settingClientBusiness.InsertUserSourceDatabase(username, itemSetting.Nop, xmlSettDB, ipRequest, item.NamaDB);
                                 //insert into user_setting_database
-                                SettingClientBusiness.InserUserSettingDatabase(username, itemSetting.Nop, itemSetting.JenisPajak, itemSetting.TarifPajak, item.QueryPajak,
+                                _settingClientBusiness.InserUserSettingDatabase(username, itemSetting.Nop, itemSetting.JenisPajak, itemSetting.TarifPajak, item.QueryPajak,
                                     item.QueryDetail, itemSetting.Alias);
                             }
                         }

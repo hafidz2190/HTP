@@ -56,7 +56,7 @@ namespace ForTestPurpose
                 //    _isSendDBSuccess = true;
                 //}
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 //_lstErrMsgDB.Add(ex.Message);
                 //_isSendDBSuccess = false;

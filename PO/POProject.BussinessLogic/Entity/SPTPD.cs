@@ -1,4 +1,6 @@
-﻿using System;
+﻿using POProject.DataAccess;
+using System;
+using System.Linq;
 
 namespace POProject.BusinessLogic.Entity
 {
@@ -22,7 +24,7 @@ namespace POProject.BusinessLogic.Entity
         {
             get
             {
-                return NopBaruBusiness.RetrieveNopBaru(Nop);
+                return NopBaruData.RetrieveNopBaru(Nop).AsEnumerable<NopBaru>().SingleOrDefault();
             }
         }
         public string Username { get; set; }

@@ -1,52 +1,62 @@
-using POProject.DataAccess;
+using POProject.BusinessLogic.BusinessData;
+using POProject.Model;
 using System;
 using System.Collections.Generic;
 
 namespace POProject.BusinessLogic
 {
-    public class UserTransactionDetailBusiness
+    public class UserTransactionDetailBusiness : IUserTransactionDetailBusiness
     {
-        public static bool InsertUserTransactionDetail(string username, string xmlPath, int bulan, int tahun, DateTime transDate, string ipAddress, string xmlfile, string nop)
+        private readonly IUserTransactionDetailBusinessData _userTransactionDetailBusinessData;
+
+        public UserTransactionDetailBusiness(IUserTransactionDetailBusinessData userTransactionDetailBusinessData)
         {
-            return UserTransactionDetailData.InsertUserTransactionDetail(username, xmlPath, bulan, tahun, transDate, ipAddress, xmlfile, nop);
+            _userTransactionDetailBusinessData = userTransactionDetailBusinessData;
         }
 
-        public static IEnumerable<Entity.UserTransactionDetail> RetrieveUserTransactionDetailByMonth(string username, int bulan, int tahun)
+        public bool InsertUserTransactionDetail(string username, string xmlPath, int bulan, int tahun, DateTime transDate, string ipAddress, string xmlfile, string nop)
         {
-            return UserTransactionDetailData.RetrieveUserDetailTransactionByMonth(username, bulan, tahun).AsEnumerable<Entity.UserTransactionDetail>();
+            return _userTransactionDetailBusinessData.InsertUserTransactionDetail(username, xmlPath, bulan, tahun, transDate, ipAddress, xmlfile, nop);
         }
 
-        public static IEnumerable<Entity.UserTransactionDetail> RetrieveUserTransactionDetailByDate(string username, DateTime tgltransaksi)
+        public IEnumerable<UserTransactionDetail> RetrieveUserTransactionDetailByMonth(string username, int bulan, int tahun)
         {
-            return UserTransactionDetailData.RetrieveUserDetailTransactionByDate(username, tgltransaksi).AsEnumerable<Entity.UserTransactionDetail>();
-        }
-        public static IEnumerable<Entity.UserTransactionDetail> RetrieveUserDetailTransactionByNop(string nop, DateTime tgltransaksi)
-        {
-            return UserTransactionDetailData.RetrieveUserDetailTransactionByNop(nop, tgltransaksi).AsEnumerable<Entity.UserTransactionDetail>();
-        }
-        public static IEnumerable<Entity.UserTransactionDetail> RetrieveUserTransactionDetailByMonth(string username, string nop, int bulan, int tahun)
-        {
-            return UserTransactionDetailData.RetrieveUserDetailTransactionByMonth(username, nop, bulan, tahun).AsEnumerable<Entity.UserTransactionDetail>();
+            return _userTransactionDetailBusinessData.RetrieveUserTransactionDetailByMonth(username, bulan, tahun);
         }
 
-        public static IEnumerable<Entity.UserTransactionDetail> RetrieveUserDetailTransactionByDateTransaction(string nop, DateTime tglTransaksi)
+        public IEnumerable<UserTransactionDetail> RetrieveUserTransactionDetailByDate(string username, DateTime tgltransaksi)
         {
-            return UserTransactionDetailData.RetrieveUserDetailTransactionByDateTransaction(nop, tglTransaksi).AsEnumerable<Entity.UserTransactionDetail>();
+            return _userTransactionDetailBusinessData.RetrieveUserTransactionDetailByDate(username, tgltransaksi);
         }
 
-        public static IEnumerable<Entity.UserDetailWithPajak> RetrieveTransactionDetailOrderByDate(DateTime tglAWal, DateTime tglAkhir)
+        public IEnumerable<UserTransactionDetail> RetrieveUserDetailTransactionByNop(string nop, DateTime tgltransaksi)
         {
-            return UserTransactionDetailData.RetrieveDetailOrderByDate(tglAWal, tglAkhir).AsEnumerable<Entity.UserDetailWithPajak>();
+            return _userTransactionDetailBusinessData.RetrieveUserDetailTransactionByNop(nop, tgltransaksi);
         }
 
-        public static string GetXmlFileByNop(string nop, int bulan, int tahun)
+        public IEnumerable<UserTransactionDetail> RetrieveUserTransactionDetailByMonth(string username, string nop, int bulan, int tahun)
         {
-            return UserTransactionDetailData.GetXmlFileByNop(nop, bulan, tahun);
+            return _userTransactionDetailBusinessData.RetrieveUserTransactionDetailByMonth(username, nop, bulan, tahun);
         }
 
-        public static bool DeleteUserDetailTransaction(string nop, DateTime tglTransaksi)
+        public IEnumerable<UserTransactionDetail> RetrieveUserDetailTransactionByDateTransaction(string nop, DateTime tglTransaksi)
         {
-            return UserTransactionDetailData.DeleteUserDetailTransaction(nop, tglTransaksi);
+            return _userTransactionDetailBusinessData.RetrieveUserDetailTransactionByDateTransaction(nop, tglTransaksi);
+        }
+
+        public IEnumerable<UserDetailWithPajak> RetrieveTransactionDetailOrderByDate(DateTime tglAWal, DateTime tglAkhir)
+        {
+            return _userTransactionDetailBusinessData.RetrieveTransactionDetailOrderByDate(tglAWal, tglAkhir);
+        }
+
+        public string GetXmlFileByNop(string nop, int bulan, int tahun)
+        {
+            return _userTransactionDetailBusinessData.GetXmlFileByNop(nop, bulan, tahun);
+        }
+
+        public bool DeleteUserDetailTransaction(string nop, DateTime tglTransaksi)
+        {
+            return _userTransactionDetailBusinessData.DeleteUserDetailTransaction(nop, tglTransaksi);
         }
     }
 }

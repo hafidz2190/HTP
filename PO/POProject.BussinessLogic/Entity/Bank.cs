@@ -1,4 +1,7 @@
-﻿namespace POProject.BusinessLogic.Entity
+﻿using POProject.DataAccess;
+using System.Linq;
+
+namespace POProject.BusinessLogic.Entity
 {
     public class Bank
     {
@@ -22,6 +25,13 @@
         public bool Is_Active { get; set; }
         public string Kode_Bank { get; set; }
         public string Nop { get; set; }
-        public string NamaOp { get { return NopBaruBusiness.RetrieveNopBaru(Nop).NAMAOP; } }
+        public string NamaOp
+        {
+            get
+            {
+                NopBaru nopBaru = NopBaruData.RetrieveNopBaru(Nop).AsEnumerable<NopBaru>().SingleOrDefault();
+                return nopBaru == null ? string.Empty : nopBaru.NAMAOP;
+            }
+        }
     }
 }

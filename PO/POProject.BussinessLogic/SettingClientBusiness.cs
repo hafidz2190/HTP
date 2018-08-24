@@ -1,158 +1,146 @@
-﻿using POProject.BusinessLogic.Entity;
-using POProject.DataAccess;
+﻿using POProject.BusinessLogic.BusinessData;
+using POProject.Model;
 using System.Collections.Generic;
-using System.Data;
-using System.Linq;
 
 namespace POProject.BusinessLogic
 {
-    public class SettingClientBusiness
+    public class SettingClientBusiness : ISettingClientBusiness
     {
-        public static List<UserClient> RetrieveUserClient(string username)
+        private readonly ISettingClientBusinessData _settingClientBusinessData;
+
+        public SettingClientBusiness(ISettingClientBusinessData settingClientBusinessData)
         {
-            return SettingClientData.RetrieveUserClient(username).AsEnumerable<UserClient>().ToList();
+            _settingClientBusinessData = settingClientBusinessData;
         }
 
-        public static List<DisplayMonitor> GetDisplayMonitor(string username)
+        public List<UserClient> RetrieveUserClient(string username)
         {
-            return SettingClientData.GetDisplayMonitor(username).AsEnumerable<DisplayMonitor>().ToList();
+            return _settingClientBusinessData.RetrieveUserClient(username);
         }
 
-        public static List<ExceptionPort> RetrievePortException()
+        public List<DisplayMonitor> GetDisplayMonitor(string username)
         {
-            return SettingClientData.RetrievePortException().AsEnumerable<ExceptionPort>().ToList();
+            return _settingClientBusinessData.GetDisplayMonitor(username);
         }
 
-        public static List<UserProfile> RetrieveUserProfile(string webUsername)
+        public List<ExceptionPort> RetrievePortException()
         {
-            return SettingClientData.RetrieveUserProfile(webUsername).AsEnumerable<UserProfile>().ToList();
+            return _settingClientBusinessData.RetrievePortException();
         }
 
-        public static List<UserProfile> RetrieveUserProfileDashboard(string webUsername)
+        public List<UserProfile> RetrieveUserProfile(string webUsername)
         {
-            return SettingClientData.RetrieveUserProfileDashboard(webUsername).AsEnumerable<UserProfile>().ToList();
+            return _settingClientBusinessData.RetrieveUserProfile(webUsername);
         }
 
-        public static List<UserClient> RetrieveUserClient(string username, string email)
+        public List<UserProfile> RetrieveUserProfileDashboard(string webUsername)
         {
-            return SettingClientData.RetrieveUserClient(username, email).AsEnumerable<UserClient>().ToList();
+            return _settingClientBusinessData.RetrieveUserProfileDashboard(webUsername);
         }
 
-        public static List<UserClient> RetrieveUserClientByWebUsername(string webusername)
+        public List<UserClient> RetrieveUserClient(string username, string email)
         {
-            return SettingClientData.RetrieveUserClientByWebUsername(webusername).AsEnumerable<UserClient>().ToList();
+            return _settingClientBusinessData.RetrieveUserClient(username, email);
         }
 
-        public static bool UpdateSerialKey(string username, string serialKey)
+        public List<UserClient> RetrieveUserClientByWebUsername(string webusername)
         {
-            bool isUpdate = false;
-            if (SettingClientData.UpdateSerialKey(username, serialKey))
-            {
-                string encryptKey = POAdministrationTools.StringCipher.Encrypt(serialKey, "rereg");
-                SettingClientData.InsertHistoryRegister(username, encryptKey);
-                isUpdate = true;
-            }
-            return isUpdate;
+            return _settingClientBusinessData.RetrieveUserClientByWebUsername(webusername);
         }
 
-        public static bool IsSerialKeyExist(string serialKey, string username, string cpuId)
+        public bool UpdateSerialKey(string username, string serialKey)
         {
-            bool isExist = false;
-            string dbKey = POAdministrationTools.StringCipher.Decrypt(SettingClientData.GetSerialKey(username), "rereg");
-            if (string.Compare(dbKey, serialKey) == 0)
-            {
-                string idMachine = SettingClientData.RetrieveIdMachineByUsername(username);
-                if (string.Compare(cpuId, idMachine) == 0)
-                    isExist = true;
-            }
-
-            return isExist;
+            return _settingClientBusinessData.UpdateSerialKey(username, serialKey);
         }
 
-        public static List<UserClient> RetrieveUserClient(string username, string idMachine, string password)
+        public bool IsSerialKeyExist(string serialKey, string username, string cpuId)
         {
-            return SettingClientData.RetrieveUserClient(username, idMachine, password).AsEnumerable<UserClient>().ToList();
-        }
-        public static bool InsertUserClient(string username, string idMachine, string password, string phone, string mail, int port)
-        {
-            return SettingClientData.InsertUserClient(username, idMachine, password, phone, mail, port);
+            return _settingClientBusinessData.IsSerialKeyExist(serialKey, username, cpuId);
         }
 
-        public static bool UpdateWebUsername(string existUsername, string webUsername)
+        public List<UserClient> RetrieveUserClient(string username, string idMachine, string password)
         {
-            return SettingClientData.UpdateWebUsername(existUsername, webUsername);
+            return _settingClientBusinessData.RetrieveUserClient(username, idMachine, password);
         }
 
-        public static bool UpdateUserClient(string email, string phone, string kdBank, string username)
+        public bool InsertUserClient(string username, string idMachine, string password, string phone, string mail, int port)
         {
-            return SettingClientData.UpdateUserClient(email, phone, kdBank, username);
+            return _settingClientBusinessData.InsertUserClient(username, idMachine, password, phone, mail, port);
         }
 
-        public static List<PureNop> RetrieveNopFromUserNop()
+        public bool UpdateWebUsername(string existUsername, string webUsername)
         {
-            return SettingClientData.RetrieveUserNop().AsEnumerable<PureNop>().ToList();
+            return _settingClientBusinessData.UpdateWebUsername(existUsername, webUsername);
         }
 
-        public static List<PureNop> RetrieveMultiNopByUsername(string usern)
+        public bool UpdateUserClient(string email, string phone, string kdBank, string username)
         {
-            return SettingClientData.RetrieveMultiNopByUsername(usern).AsEnumerable<PureNop>().ToList();
+            return _settingClientBusinessData.UpdateUserClient(email, phone, kdBank, username);
         }
 
-        public static bool InsertUserNop(string username, string nop, string jenisPajak)
+        public List<PureNop> RetrieveNopFromUserNop()
         {
-            return SettingClientData.InsertUserNop(username, nop, jenisPajak);
+            return _settingClientBusinessData.RetrieveNopFromUserNop();
         }
 
-        public static bool InsertUserSettingColumn(string username, string nop, string colName, string colText)
+        public List<PureNop> RetrieveMultiNopByUsername(string usern)
         {
-            return SettingClientData.InsertUserSettingColumn(username, nop, colName, colText);
+            return _settingClientBusinessData.RetrieveMultiNopByUsername(usern);
         }
 
-        public static List<UserSettingColumn> RetrieveUserSettingColumn(string username, string nop)
+        public bool InsertUserNop(string username, string nop, string jenisPajak)
         {
-            return SettingClientData.RetrieveUserSettingColumn(username, nop).AsEnumerable<UserSettingColumn>().ToList();
+            return _settingClientBusinessData.InsertUserNop(username, nop, jenisPajak);
         }
 
-        public static bool InsertUserSourceDatabase(string username, string nop, string xmlSettDB, string ip, string namaDB)
+        public bool InsertUserSettingColumn(string username, string nop, string colName, string colText)
         {
-            return SettingClientData.InsertUserSourceDatabase(username, nop, xmlSettDB, ip, namaDB);
+            return _settingClientBusinessData.InsertUserSettingColumn(username, nop, colName, colText);
         }
 
-        public static bool InserUserSettingDatabase(string username, string nop, string jenPajak, string tarif, string queryPajak, string queryDetail, string Alias)
+        public List<UserSettingColumn> RetrieveUserSettingColumn(string username, string nop)
         {
-            return SettingClientData.InserUserSettingDatabase(username, nop, jenPajak, tarif, queryPajak, queryDetail, Alias);
+            return _settingClientBusinessData.RetrieveUserSettingColumn(username, nop);
         }
 
-        public static bool IsUserUsingDatabase(string username)
+        public bool InsertUserSourceDatabase(string username, string nop, string xmlSettDB, string ip, string namaDB)
         {
-            return SettingClientData.IsUserUsingDatabase(username);
+            return _settingClientBusinessData.InsertUserSourceDatabase(username, nop, xmlSettDB, ip, namaDB);
         }
 
-        public static bool isUserNopExist(string username, string nop)
+        public bool InserUserSettingDatabase(string username, string nop, string jenPajak, string tarif, string queryPajak, string queryDetail, string Alias)
         {
-            return SettingClientData.isUserNopExist(username, nop);
+            return _settingClientBusinessData.InserUserSettingDatabase(username, nop, jenPajak, tarif, queryPajak, queryDetail, Alias);
         }
 
-        public static List<settingDBSource> RetrieveSourceDB(string username)
+        public bool IsUserUsingDatabase(string username)
         {
-            return SettingClientData.RetrieveSourceDB(username).AsEnumerable<settingDBSource>().ToList();
+            return _settingClientBusinessData.IsUserUsingDatabase(username);
         }
 
-        public static List<DatabaseColUsed> RetrieveUserDatabaseColumn(string jenisPajak)
+        public bool isUserNopExist(string username, string nop)
         {
-            DataTable dt = SettingClientData.RetrieveUserDatabaseColumn(jenisPajak);
-
-            return dt.AsEnumerable<DatabaseColUsed>().ToList();
+            return _settingClientBusinessData.isUserNopExist(username, nop);
         }
 
-        public static bool InsertXmlFile(string username, string filename, string xmlContent, string fileNote, string separator)
+        public List<settingDBSource> RetrieveSourceDB(string username)
         {
-            return SettingClientData.InsertXmlFile(username, filename, xmlContent, fileNote, separator);
+            return _settingClientBusinessData.RetrieveSourceDB(username);
         }
 
-        public static List<UserXMLFile> RetrieveUserXmlFile(string username)
+        public List<DatabaseColUsed> RetrieveUserDatabaseColumn(string jenisPajak)
         {
-            return SettingClientData.RetrieveUserXmlFile(username).AsEnumerable<UserXMLFile>().ToList();
+            return _settingClientBusinessData.RetrieveUserDatabaseColumn(jenisPajak);
+        }
+
+        public bool InsertXmlFile(string username, string filename, string xmlContent, string fileNote, string separator)
+        {
+            return _settingClientBusinessData.InsertXmlFile(username, filename, xmlContent, fileNote, separator);
+        }
+
+        public List<UserXMLFile> RetrieveUserXmlFile(string username)
+        {
+            return _settingClientBusinessData.RetrieveUserXmlFile(username);
         }
     }
 }

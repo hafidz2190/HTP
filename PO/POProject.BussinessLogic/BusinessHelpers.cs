@@ -491,9 +491,8 @@ namespace POProject.BusinessLogic
                             }
                         }
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
-
                     }
 
 

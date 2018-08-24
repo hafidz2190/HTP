@@ -25,9 +25,17 @@ export default class BasicLayout extends React.Component {
   }
 
   render() {
+    console.log(this.props);
     return (
       <Layout style={{ minHeight: '100vh' }}>
-        <Header style={{ background: '#fff', padding: 0 }}>
+        <Header style={{
+          background: '#fff',
+          padding: 0,
+          boxShadow: '1px 2px 5px #bedfff5c',
+          zIndex: 3,
+          position: 'fixed',
+          width: '100%'
+        }}>
           <DashboardHeader />
         </Header>
         <Layout>
@@ -40,7 +48,7 @@ export default class BasicLayout extends React.Component {
             <div className="logo" />
             <SideMenu />
           </Sider>
-          <Content style={{ margin: '0 0px' }}>
+          <Content style={{ margin: '0 0px', position: 'relative', top: 65 }}>
             <Breadcrumb style={{ margin: '16px 0' }}>
               <Breadcrumb.Item>
                 <Icon type="home" style={{ marginRight: '5px' }} />

@@ -15,7 +15,7 @@ export default class SideMenu extends React.Component {
 
     render() {
         return (
-            <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline">
+            <Menu style={{ position: 'sticky', top: 80 }} theme="dark" defaultSelectedKeys={['1']} mode="inline">
                 <Menu.Item key="1">
                     <Link to='/'>
                         <Icon type="home" />
@@ -28,12 +28,12 @@ export default class SideMenu extends React.Component {
                         <span>Profil</span>
                     </Link>
                 </Menu.Item>
-                <Menu.Item key="3">
+                {/* <Menu.Item key="3">
                     <Link to='/information'>
                         <Icon type="info-circle" />
                         <span>Hasil Perekaman</span>
                     </Link>
-                </Menu.Item>
+                </Menu.Item> */}
                 <Menu.Item key="4">
                     <Link to='/adjustment'>
                         <Icon type="desktop" />

@@ -3,6 +3,7 @@ import { Layout, Breadcrumb, Icon } from 'antd';
 import { Route } from "react-router-dom";
 
 import SideMenu from '../SideMenu';
+import LoginPage from '../LoginPage';
 import DashboardHeader from '../DashboardHeader';
 import DashboardPage from '../DashboardPage';
 import ProfilePage from '../ProfilePage';
@@ -57,6 +58,7 @@ export default class BasicLayout extends React.Component {
               <Breadcrumb.Item>Dashboard</Breadcrumb.Item>
             </Breadcrumb>
             <div style={{ padding: 24, background: '#fff', minHeight: 360 }}>
+              <Route exact path="/login" component={LoginPage} />
               <Route exact path="/" component={DashboardPage} />
               <Route exact path="/profile" component={ProfilePage} />
               <Route exact path="/information" component={InformationPage} />

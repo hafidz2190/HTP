@@ -31,7 +31,7 @@ class App extends Component {
     return (
       <div className="App">
         <BrowserRouter>
-          <BasicLayout />
+          <BasicLayout {...this.props}/>
         </BrowserRouter>
       </div>
     );

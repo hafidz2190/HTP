@@ -1,5 +1,7 @@
 import React from 'react';
-import { Button, Input, Icon } from 'antd';
+import { Button, Input, Icon, Form } from 'antd';
+
+const FormItem = Form.Item;
 
 export default class LoginPage extends React.Component {
     state = {
@@ -15,6 +17,10 @@ export default class LoginPage extends React.Component {
             this.setState({ password: '' });
         }
     }
+    handleSubmit = (evt) => {
+        evt.preventDefault();
+        this.props.onLogin(this.state.userName);
+    }
     onChangeUserName = (e) => {
         this.setState({ userName: e.target.value });
     }
@@ -29,35 +35,38 @@ export default class LoginPage extends React.Component {
             position: 'fixed',
             top: 0,
             left: 0,
-            background: 'white',
+            background: '#f9f9f9',
             width: '100%',
             height: '100%',
             zIndex: 3,
-            paddingTop: '50vh',
         }
         return (
             <div style={pageContainerStyle}>
-                <div>
-                    <h3>Login</h3>
-                    <Input
-                        placeholder="Enter your username"
-                        prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />}
-                        suffix={uSuffix}
-                        value={userName}
-                        onChange={this.onChangeUserName}
-                        ref={node => this.userNameInput = node}
-                    />
-                    <Input
-                        type={'password'}
-                        placeholder="Enter your password"
-                        prefix={<Icon type="key" style={{ color: 'rgba(0,0,0,.25)' }} />}
-                        suffix={pSuffix}
-                        value={password}
-                        onChange={this.onChangePassword}
-                        ref={node => this.passwordInput = node}
-                    />
-                    <Button type={'primary'}> Login </Button>
-                </div>
+                <Form style={{ margin: '30vh auto 0', maxWidth: '300px' }} onSubmit={this.handleSubmit} className="form-login">
+                    <h3>BPPKD KOTA SURABAYA</h3>
+                    <FormItem>
+                        <Input
+                            placeholder="Enter your username"
+                            prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />}
+                            suffix={uSuffix}
+                            value={userName}
+                            onChange={this.onChangeUserName}
+                            ref={node => this.userNameInput = node}
+                        />
+                    </FormItem>
+                    <FormItem>
+                        <Input
+                            type="password"
+                            placeholder="Enter your password"
+                            prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />}
+                            suffix={pSuffix}
+                            value={password}
+                            onChange={this.onChangePassword}
+                            ref={node => this.passwordInput = node}
+                        />
+                    </FormItem>
+                    <Button style={{ width: '100%' }} htmlType="submit" className="login-form-button" type="primary"> Login </Button>
+                </Form>
             </div>
         )
     }

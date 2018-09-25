@@ -30,9 +30,23 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AutoMapper, Version=7.0.1.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoMapper.7.0.1\lib\net45\AutoMapper.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.5.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -42,6 +56,43 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BankBusiness.cs" />
+    <Compile Include="BusinessDataModel\SerialNoteBusinessDataModel.cs" />
+    <Compile Include="BusinessDataModel\SPTPDetailBusinessModel.cs" />
+    <Compile Include="BusinessDataModel\UserTransactionBusinessDataModel.cs" />
+    <Compile Include="BusinessDataModel\UserTransactionDetailBusinessDataModel.cs" />
+    <Compile Include="BusinessData\BankBusinessData.cs" />
+    <Compile Include="BusinessData\BankBusinessDataOracleCommand.cs" />
+    <Compile Include="BusinessData\IBankBusinessData.cs" />
+    <Compile Include="BusinessData\IJatuhTempoBusinessData.cs" />
+    <Compile Include="BusinessData\INopBaruBusinessData.cs" />
+    <Compile Include="BusinessData\ISerialNoteBusinessData.cs" />
+    <Compile Include="BusinessData\ISettingClientBusinessData.cs" />
+    <Compile Include="BusinessData\ISPTPDDetailBusinessData.cs" />
+    <Compile Include="BusinessData\IUpdateVersionBusinessData.cs" />
+    <Compile Include="BusinessData\IUserActivityBusinessData.cs" />
+    <Compile Include="BusinessData\IUserSettingColumnBusinessData.cs" />
+    <Compile Include="BusinessData\IUserTransactionBusinessData.cs" />
+    <Compile Include="BusinessData\IUserTransactionDetailBusinessData.cs" />
+    <Compile Include="BusinessData\JatuhTempoBusinessData.cs" />
+    <Compile Include="BusinessData\JatuhTempoBusinessDataOracleCommand.cs" />
+    <Compile Include="BusinessData\NopBaruBusinessData.cs" />
+    <Compile Include="BusinessData\NopBaruBusinessDataOracleCommand.cs" />
+    <Compile Include="BusinessData\SerialNoteBusinessData.cs" />
+    <Compile Include="BusinessData\SerialNoteBusinessDataOracleCommand.cs" />
+    <Compile Include="BusinessData\SettingClientBusinessData.cs" />
+    <Compile Include="BusinessData\SettingClientBusinessDataOracleCommand.cs" />
+    <Compile Include="BusinessData\SPTPDDetailBusinessData.cs" />
+    <Compile Include="BusinessData\SPTPDDetailBusinessDataOracleCommand.cs" />
+    <Compile Include="BusinessData\UpdateVersionBusinessData.cs" />
+    <Compile Include="BusinessData\UpdateVersionBusinessDataOracleCommand.cs" />
+    <Compile Include="BusinessData\UserActivityBusinessData.cs" />
+    <Compile Include="BusinessData\UserActivityBusinessDataOracleCommand.cs" />
+    <Compile Include="BusinessData\UserSettingColumnBusinessData.cs" />
+    <Compile Include="BusinessData\UserSettingColumnBusinessDataOracleCommand.cs" />
+    <Compile Include="BusinessData\UserTransactionBusinessData.cs" />
+    <Compile Include="BusinessData\UserTransactionBusinessDataOracleCommand.cs" />
+    <Compile Include="BusinessData\UserTransactionDetailBusinessData.cs" />
+    <Compile Include="BusinessData\UserTransactionDetailBusinessDataOracleCommand.cs" />
     <Compile Include="BusinessHelpers.cs" />
     <Compile Include="Entity\AppSettings.cs" />
     <Compile Include="Entity\Bank.cs" />
@@ -61,6 +112,18 @@
     <Compile Include="Entity\UserSettingColumn.cs" />
     <Compile Include="Entity\UserTransaction.cs" />
     <Compile Include="Entity\UserTransactionDetail.cs" />
+    <Compile Include="Helper\ModelToBusinessModelMapper.cs" />
+    <Compile Include="IBankBusiness.cs" />
+    <Compile Include="IJatuhTempoBusiness.cs" />
+    <Compile Include="INopBaruBusiness.cs" />
+    <Compile Include="ISerialNoteBusiness.cs" />
+    <Compile Include="ISettingClientBusiness.cs" />
+    <Compile Include="ISPTPDDetailBusiness.cs" />
+    <Compile Include="IUpdateVersionBusiness.cs" />
+    <Compile Include="IUserActivityBusiness.cs" />
+    <Compile Include="IUserSettingColumnBusiness.cs" />
+    <Compile Include="IUserTransactionBusiness.cs" />
+    <Compile Include="IUserTransactionDetailBusiness.cs" />
     <Compile Include="JadwalBusiness.cs" />
     <Compile Include="JatuhTempoBusiness.cs" />
     <Compile Include="Mapper.cs" />
@@ -70,6 +133,7 @@
     <Compile Include="SerialNoteBusiness.cs" />
     <Compile Include="SettingClientBusiness.cs" />
     <Compile Include="SPTPDBusiness.cs" />
+    <Compile Include="SPTPDDetailBusiness.cs" />
     <Compile Include="UpdateVersionBusiness.cs" />
     <Compile Include="UserActivityBusiness.cs" />
     <Compile Include="UserApiUrlBusiness.cs" />
@@ -87,9 +151,14 @@
       <Project>{656f188d-2d6d-4f24-9b96-9f8af7a918fd}</Project>
       <Name>POProject.DataAccess</Name>
     </ProjectReference>
+    <ProjectReference Include="..\POProject.Model\POProject.Model.csproj">
+      <Project>{cea4ad70-63e3-4d9f-adc2-26ce46128c1f}</Project>
+      <Name>POProject.Model</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

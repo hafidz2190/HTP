@@ -1,4 +1,5 @@
 ﻿using POProject.BusinessLogic.Entity;
+using System;
 using System.Collections.Generic;
 using System.Data;
 
@@ -30,6 +31,11 @@ namespace POProject.BusinessLogic
                 });
             }
             return result;
+        }
+
+        internal static void CreateMap<T1, T2>()
+        {
+            throw new NotImplementedException();
         }
 
         public static List<VirtualAccountBankItem> MapVirtualAccountBank(DataTable source)

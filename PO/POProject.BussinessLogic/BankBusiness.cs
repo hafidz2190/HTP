@@ -1,26 +1,37 @@
-﻿using POProject.BusinessLogic.Entity;
-using POProject.DataAccess;
+﻿using POProject.BusinessLogic.BusinessData;
+using POProject.Model;
 using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 
 namespace POProject.BusinessLogic
 {
-    public class BankBusiness
+    public class BankBusiness : IBankBusiness
     {
-        public static List<Bank> RetrieveDataBank(string kdBank)
+        private readonly IBankBusinessData _bankBusinessData;
+
+        public BankBusiness(IBankBusinessData bankBusinessData)
         {
-            return BankData.RetrieveDataBank(kdBank).AsEnumerable<Entity.Bank>().ToList();
+            _bankBusinessData = bankBusinessData;
         }
 
-        public static List<DataBayarBank> RetrieveDataPembayaranByKdBankUser(string kdBank)
+        public List<Bank> RetrieveDataBank(string kdBank)
         {
-            return BankData.RetrieveDataPembayaranByKdBankUser(kdBank).AsEnumerable<DataBayarBank>().ToList();
+            return _bankBusinessData.RetrieveDataBank(kdBank);
         }
 
-        public static DataTable DtRetrieveDataPembayaranByKdBankUser(string kdBank)
+        public List<DataBayarBank> RetrieveDataPembayaranByKdBankUser(string kdBank)
         {
-            return BankData.RetrieveDataPembayaranByKdBankUser(kdBank);
+            return _bankBusinessData.RetrieveDataPembayaranByKdBankUser(kdBank);
+        }
+
+        public DataTable DtRetrieveDataPembayaranByKdBankUser(string kdBank)
+        {
+            return _bankBusinessData.DtRetrieveDataPembayaranByKdBankUser(kdBank);
+        }
+
+        public List<Bank> RetrieveDataBankSqlQuery(string sqlQuery, IDictionary<string, object> parameters)
+        {
+            return _bankBusinessData.RetrieveDataBankSqlQuery(sqlQuery, parameters);
         }
     }
 }

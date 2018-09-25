@@ -1,15 +1,20 @@
-﻿using POProject.BusinessLogic.Entity;
-using POProject.DataAccess;
-using System.Collections.Generic;
-using System.Linq;
+﻿using POProject.BusinessLogic.BusinessData;
+using POProject.Model;
 
 namespace POProject.BusinessLogic
 {
-    public class NopBaruBusiness
+    public class NopBaruBusiness : INopBaruBusiness
     {
-        public static NopBaru RetrieveNopBaru(string nop)
+        private readonly INopBaruBusinessData _nopBaruBusinessData;
+
+        public NopBaruBusiness(INopBaruBusinessData nopBaruBusinessData)
         {
-            return NopBaruData.RetrieveNopBaru(nop).AsEnumerable<NopBaru>().SingleOrDefault();
+            _nopBaruBusinessData = nopBaruBusinessData;
+        }
+
+        public NopBaru RetrieveNopBaru(string nop)
+        {
+            return _nopBaruBusinessData.RetrieveNopBaru(nop);
         }
     }
 }

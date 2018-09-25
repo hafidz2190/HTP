@@ -1,67 +1,42 @@
-﻿using POProject.BusinessLogic.Entity;
-using POProject.DataAccess;
+﻿using POProject.BusinessLogic.BusinessData;
+using POProject.Model;
 using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Linq;
 
 namespace POProject.BusinessLogic
 {
-    public class UserActivityBusiness
+    public class UserActivityBusiness : IUserActivityBusiness
     {
-        public static List<UserActivity> RetrieveUserActivity(string username)
+        private readonly IUserActivityBusinessData _userActivityBusinessData;
+
+        public UserActivityBusiness(IUserActivityBusinessData userActivityBusinessData)
         {
-            return UserActivityData.RetrieveUserActivity(username).AsEnumerable<UserActivity>().ToList();
+            _userActivityBusinessData = userActivityBusinessData;
         }
 
-        public static bool InsertUserActivity(string username, string ipAddress, DateTime activityDate, bool status, string keterangan)
+        public List<UserActivity> RetrieveUserActivity(string username)
         {
-            return UserActivityData.InsertUserActivity(username, ipAddress, activityDate, status, keterangan);
+            return _userActivityBusinessData.RetrieveUserActivity(username);
         }
 
-        public static bool InsertUserTempError(string username, DateTime activityDate)
+        public bool InsertUserActivity(string username, string ipAddress, DateTime activityDate, bool status, string keterangan)
         {
-            return UserActivityData.InsertUserTempError(username, activityDate);
+            return _userActivityBusinessData.InsertUserActivity(username, ipAddress, activityDate, status, keterangan);
         }
 
-        public static string GetUrlApi()
+        public bool InsertUserTempError(string username, DateTime activityDate)
         {
-            return UserActivityData.GetUrlApi();
+            return _userActivityBusinessData.InsertUserTempError(username, activityDate);
         }
 
-        public static DateTime GetLastErrorDate(string username)
+        public string GetUrlApi()
         {
-            DateTime tgl = new DateTime();
-            DataTable dt = new DataTable();
-            bool isError = false;
+            return _userActivityBusinessData.GetUrlApi();
+        }
 
-            dt = UserActivityData.GetLastErrorDate(username);
-            if (dt != null && dt.Rows.Count > 0)
-            {
-                #region Old Code
-                //foreach (DataRow dRow in dt.Rows)
-                //{
-                //    int status_error = Convert.ToInt32(dRow["STATUS_ERROR"]);
-                //    if (isError && status_error == 0)
-                //        break;
-
-                //    if (status_error == 1)
-                //    {
-                //        tgl = Convert.ToDateTime(dRow["ACTIVITY_DATE"]);
-                //        isError = true;
-                //    }
-                //}
-                #endregion
-                #region New Code
-                tgl = dt.Rows[0]["LAST_DATE"].AsDateTime();
-                isError = true;
-                #endregion
-            }
-
-            if (!isError)
-                tgl = DateTime.Now.AddDays(-1);
-
-            return tgl;
+        public DateTime GetLastErrorDate(string username)
+        {
+            return _userActivityBusinessData.GetLastErrorDate(username);
         }
     }
 }

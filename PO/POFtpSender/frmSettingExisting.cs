@@ -68,7 +68,7 @@ namespace POFtpSender
                     return;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 _errorMessage = "Koneksi Gagal : 99";
                 return;

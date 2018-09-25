@@ -38,5 +38,15 @@ namespace POProject.DataAccess
         {
             return new CommandAdapter.MsAccessCmdBuilder("", "");
         }
+
+        public static string GetSettingDB()
+        {
+            return SettingDB;
+        }
+
+        public static string GetAvailableCommandNote()
+        {
+            return AvailableCommandNote;
+        }
     }
 }

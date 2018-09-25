@@ -1,24 +1,33 @@
-﻿using POProject.DataAccess;
+﻿using POProject.BusinessLogic.BusinessData;
+using POProject.BusinessLogic.BusinessDataModel;
+using POProject.BusinessLogic.Helper;
+using POProject.Model;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace POProject.BusinessLogic
 {
-    public class SerialNoteBusiness
+    public class SerialNoteBusiness : ISerialNoteBusiness
     {
-        public static List<Entity.SerialNote> RetrieveAvailableSerialNote()
+        private readonly ISerialNoteBusinessData _serialNoteBusinessData;
+
+        public SerialNoteBusiness(ISerialNoteBusinessData serialNoteBusinessData)
         {
-            return SerialNoteData.RetrieveAvailableSerialNote().AsEnumerable<Entity.SerialNote>().ToList();
+            _serialNoteBusinessData = serialNoteBusinessData;
         }
 
-        public static List<Entity.SerialNote> RetrieveTakenSerialNote()
+        public List<SerialNoteBusinessDataModel> RetrieveAvailableSerialNote()
         {
-            return SerialNoteData.RetrieveAllTakenSerialNote().AsEnumerable<Entity.SerialNote>().ToList();
+            return ModelToBusinessModelMapper.Convert<SerialNote, SerialNoteBusinessDataModel>(_serialNoteBusinessData.RetrieveAvailableSerialNote());
         }
 
-        public static bool UpdateData(string enckode, string username, string hwID)
+        public List<SerialNoteBusinessDataModel> RetrieveTakenSerialNote()
         {
-            return SerialNoteData.UpdateData(enckode, username, hwID);
+            return ModelToBusinessModelMapper.Convert<SerialNote, SerialNoteBusinessDataModel>(_serialNoteBusinessData.RetrieveTakenSerialNote());
+        }
+
+        public bool UpdateData(string enckode, string username, string hwID)
+        {
+            return _serialNoteBusinessData.UpdateData(enckode, username, hwID);
         }
     }
 }

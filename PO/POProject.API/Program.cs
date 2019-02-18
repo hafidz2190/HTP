@@ -56,7 +56,7 @@ namespace POProject.API
                 Console.WriteLine($"Server is up : {uri.AbsoluteUri}");
 
                 signalRHost.Open();
-                Console.WriteLine(string.Format("SignalR Host opened: {0}", signalRHostBaseAddress));
+                Console.WriteLine(string.Format("Host Connection opened at: {0}", signalRHostBaseAddress));
 
                 // example how to broadcast message to specific connection id
                 //var context = GlobalHost.ConnectionManager.GetHubContext<MonitorHub>();

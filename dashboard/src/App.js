@@ -1,11 +1,14 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import logo from './logo.svg';
+import { BrowserRouter } from 'react-router-dom'
+import BasicLayout from './js/components/Layout/BasicLayout';
+// import logo from './logo.svg';
 import './App.css';
+import 'antd/dist/antd.css';
 
 import * as AppStateAction from './js/stores/actions/appStateActions';
 
-import { HubConnection } from 'signalr-client-react';
+// import { HubConnection } from 'signalr-client-react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
@@ -23,20 +26,13 @@ function mapDispatchToProps(dispatch) {
 
 
 class App extends Component {
-  constructor(props) {
-    super(props);
-  }
 
   render() {
     return (
       <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
-        </header>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
+        <BrowserRouter>
+          <BasicLayout {...this.props}/>
+        </BrowserRouter>
       </div>
     );
   }

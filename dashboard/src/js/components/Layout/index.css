@@ -1,0 +1,12 @@
+.title, .section {
+    border-bottom: 1px solid #b1daff;
+}
+.title h1, .title h4 {
+    display: inline-block;
+}
+.title h1 {
+    margin-right: 5px;
+}
+.section {
+    padding: 10px 0;
+}

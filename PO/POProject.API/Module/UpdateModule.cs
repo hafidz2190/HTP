@@ -50,7 +50,8 @@ namespace POProject.API.Module
           return Response.AsJson( new { code = HttpStatusCode.InternalServerError, message = $"Error, {ex.Message}" } );
         }
 
-        return Response.AsJson( new { code = HttpStatusCode.OK, message = "Ok", Version = version, PathDir = latestVers.FirstOrDefault().path_directory } );
+        var pathDir = latestVers.FirstOrDefault() == null ? "-" : latestVers.First().path_directory;
+        return Response.AsJson(new { code = HttpStatusCode.OK, message = "Ok", Version = version, PathDir = pathDir });
       };
 
       Post[UPDATE] = parameter =>

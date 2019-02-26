@@ -8,6 +8,5 @@
         public int MasaPajak { get; set; }
         public int Tahun { get; set; }
         public double Nominal { get; set; }
-        public string StrNominal { get; set; }
     }
 }

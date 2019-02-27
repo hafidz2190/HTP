@@ -34,6 +34,7 @@ namespace POProject.DataAccess.Persistance
       modelBuilder.Entity<Year>().ToTable("YEAR");
       modelBuilder.Entity<SPTPD>().ToTable("SPTPD");
       modelBuilder.Entity<SPTPDDetail>().ToTable("SPTPD_DETAIL");
+      modelBuilder.Entity<settingDBSource>().ToTable("USER_SOURCE_DB");
     }
 
     public DbSet<Bank> BANK { get; set; }

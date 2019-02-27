@@ -175,8 +175,7 @@ namespace POProject.API.Module
                     var body = Nancy.IO.RequestStream.FromStream(Request.Body).AsString();
                     log.Info("Deserialize object from json body");
                     SourceDBRequest source = JsonConvert.DeserializeObject<SourceDBRequest>(body);
-                    //todo delete 1 row below List<settingDBSource> lstSource = _settingClientBusiness.RetrieveSourceDB(source.username);
-                    List<settingDBSource> lstSource = null;
+                    List<settingDBSource> lstSource = _settingClientBusiness.RetrieveSourceDB(source.username);
 
                     log.Info("Serialize json from body");
                     var jsonBody = JsonConvert.SerializeObject(lstSource);

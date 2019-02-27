@@ -23,7 +23,9 @@ namespace POProject.BusinessLogic.BusinessData
     {
       string commandNote = DataBaseHelper.GetAvailableCommandNote();
 
-      return _dataManager.Get<SerialNote>((e => e.Status == commandNote)).ToList();
+      List<SerialNote> serials = _dataManager.Get<SerialNote>((e => e.Status == commandNote)).ToList();
+
+      return serials;
     }
 
     public List<SerialNote> RetrieveTakenSerialNote()

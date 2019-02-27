@@ -19,7 +19,7 @@ namespace POProject.BusinessLogic.BusinessData
 
         public DateTime GetLastErrorDate(string username)
         {
-            UserTransaction userTransaction = _dataManager.GetFirst<UserTransaction>((e => e.Username == username), (q => q.OrderByDescending(e => e.Tanggal)));
+            UserTransaction userTransaction = _dataManager.GetFirstOrDefault<UserTransaction>((e => e.Username == username), (q => q.OrderByDescending(e => e.Tanggal)));
 
             return userTransaction == null ? DateTime.Now.AddDays(-1) : userTransaction.Tanggal;
         }

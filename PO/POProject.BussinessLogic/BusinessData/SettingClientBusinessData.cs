@@ -112,7 +112,32 @@ namespace POProject.BusinessLogic.BusinessData
 
     public bool InsertUserSourceDatabase(string username, string nop, string xmlSettDB, string ip, string namaDB)
     {
-      throw new NotImplementedException();
+      bool result = true;
+
+      using (var transaction = _dataManager.BeginTransaction())
+      {
+        try
+        {
+          _dataManager.Create(new settingDBSource()
+          {
+            username = username,
+            nop = nop,
+            settingDB = xmlSettDB,
+            ipSender = ip,
+            namaDB = namaDB
+          });
+
+          _dataManager.Save();
+          transaction.Commit();
+        }
+        catch (Exception)
+        {
+          result = false;
+          transaction.Rollback();
+        }
+      }
+
+      return result;
     }
 
     public bool InsertXmlFile(string username, string filename, string xmlContent, string fileNote, string separator)
@@ -147,7 +172,34 @@ namespace POProject.BusinessLogic.BusinessData
 
     public bool InserUserSettingDatabase(string username, string nop, string jenPajak, string tarif, string queryPajak, string queryDetail, string Alias)
     {
-      throw new NotImplementedException();
+      bool result = true;
+
+      using (var transaction = _dataManager.BeginTransaction())
+      {
+        try
+        {
+          _dataManager.Create(new UserSettingDatabase()
+          {
+            Username = username,
+            Nop = nop,
+            JenisPajak = jenPajak,
+            Tarif = tarif,
+            Query_Detail = queryDetail,
+            Query_Pajak = queryPajak,
+            Alias = Alias
+          });
+
+          _dataManager.Save();
+          transaction.Commit();
+        }
+        catch (Exception)
+        {
+          result = false;
+          transaction.Rollback();
+        }
+      }
+
+      return result;
     }
 
     public bool IsSerialKeyExist(string serialKey, string username, string cpuId)
@@ -157,7 +209,7 @@ namespace POProject.BusinessLogic.BusinessData
 
     public bool isUserNopExist(string username, string nop)
     {
-      throw new NotImplementedException();
+      return _dataManager.GetExist<UserNOP>(e => e.Username == username && e.NOP == nop && !e.IsDeleted);
     }
 
     public bool IsUserUsingDatabase(string username)
@@ -182,7 +234,7 @@ namespace POProject.BusinessLogic.BusinessData
 
     public List<settingDBSource> RetrieveSourceDB(string username)
     {
-      throw new NotImplementedException();
+      return _dataManager.Get<settingDBSource>(e => e.username == username).ToList();
     }
 
     public List<UserClient> RetrieveUserClient(string username)

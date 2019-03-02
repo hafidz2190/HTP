@@ -16,7 +16,7 @@ namespace POProject.API.Module
 {
   public class DevModule : NancyModule
   {
-    private static readonly ILog log = LogManager.GetLogger(typeof(DevModule));
+    private static readonly ILog log = LogManager.GetLogger( typeof( DevModule ) );
     private readonly IJatuhTempoBusiness _jatuhTempoBusiness;
     private readonly ISettingClientBusiness _settingClientBusiness;
     private readonly ISPTPDDetailBusiness _sPTPDDetailBusiness;
@@ -25,7 +25,7 @@ namespace POProject.API.Module
     private readonly IUserTransactionBusiness _userTransactionBusiness;
     private readonly IUserTransactionDetailBusiness _userTransactionDetailBusiness;
 
-    public DevModule(IJatuhTempoBusiness jatuhTempoBusiness, ISettingClientBusiness settingClientBusiness, ISPTPDDetailBusiness sPTPDDetailBusiness, IUserActivityBusiness userActivityBusiness, IUserSettingColumnBusiness userSettingColumnBusiness, IUserTransactionBusiness userTransactionBusiness, IUserTransactionDetailBusiness userTransactionDetailBusiness)
+    public DevModule( IJatuhTempoBusiness jatuhTempoBusiness, ISettingClientBusiness settingClientBusiness, ISPTPDDetailBusiness sPTPDDetailBusiness, IUserActivityBusiness userActivityBusiness, IUserSettingColumnBusiness userSettingColumnBusiness, IUserTransactionBusiness userTransactionBusiness, IUserTransactionDetailBusiness userTransactionDetailBusiness )
     {
       _jatuhTempoBusiness = jatuhTempoBusiness;
       _settingClientBusiness = settingClientBusiness;
@@ -42,14 +42,14 @@ namespace POProject.API.Module
         {
           List<ExceptionPort> listPort = new List<ExceptionPort>();
           listPort = _settingClientBusiness.RetrievePortException();
-          log.Debug("Get list port");
-          jsonBody = JsonConvert.SerializeObject(listPort);
-          log.Debug("Connection Success");
-          return Response.AsJson(new { value = "OK", body = jsonBody });
+          log.Debug( "Get list port" );
+          jsonBody = JsonConvert.SerializeObject( listPort );
+          log.Debug( "Connection Success" );
+          return Response.AsJson( new { value = "OK", body = jsonBody } );
         }
-        catch (Exception ex)
+        catch( Exception ex )
         {
-          return Response.AsJson(new { value = "Error : " + ex.Message, body = jsonBody });
+          return Response.AsJson( new { value = "Error : " + ex.Message, body = jsonBody } );
         }
 
 
@@ -57,111 +57,111 @@ namespace POProject.API.Module
 
       Get["/dev/getAllUser"] = parameter =>
       {
-        log.Debug("Start:/dev/getAllUser");
+        log.Debug( "Start:/dev/getAllUser" );
         List<string> lstUsr = new List<string>();
         try
         {
           lstUsr = _userSettingColumnBusiness.RetrieveAllUser();
-          log.Debug("Get User Success");
+          log.Debug( "Get User Success" );
         }
-        catch (Exception ex)
+        catch( Exception ex )
         {
-                //log.Debug( "Get User Failed : " + ex.Message );
-                log.Fatal("Error:/dev/getAllUser", ex);
-          return Response.AsJson(new { code = HttpStatusCode.NotFound, message = "Data Not Found", body = string.Empty });
+          //log.Debug( "Get User Failed : " + ex.Message );
+          log.Fatal( "Error:/dev/getAllUser", ex );
+          return Response.AsJson( new { code = HttpStatusCode.NotFound, message = "Data Not Found", body = string.Empty } );
         }
 
-        var jsonBody = JsonConvert.SerializeObject(lstUsr);
-        return Response.AsJson(new { code = HttpStatusCode.OK, message = "Ok", body = jsonBody });
+        var jsonBody = JsonConvert.SerializeObject( lstUsr );
+        return Response.AsJson( new { code = HttpStatusCode.OK, message = "Ok", body = jsonBody } );
       };
 
       Get["/dev/getSerialKeyIsExist"] = parameter =>
       {
-        log.Debug("Start:/dev/getSerialKeyIsExist");
+        log.Debug( "Start:/dev/getSerialKeyIsExist" );
         try
         {
-          string body = Nancy.IO.RequestStream.FromStream(Request.Body).AsString();
-          bool isFound = _userSettingColumnBusiness.IsSerialFound(body);
-          if (isFound)
+          string body = Nancy.IO.RequestStream.FromStream( Request.Body ).AsString();
+          bool isFound = _userSettingColumnBusiness.IsSerialFound( body );
+          if( isFound )
           {
-            log.Debug("Serial is found");
-            return Response.AsJson(new { code = HttpStatusCode.OK, message = "Found", body = "True" });
+            log.Debug( "Serial is found" );
+            return Response.AsJson( new { code = HttpStatusCode.OK, message = "Found", body = "True" } );
           }
           else
           {
-            log.Debug("Serial not found");
-            return Response.AsJson(new { code = HttpStatusCode.OK, message = "Not", body = "False" });
+            log.Debug( "Serial not found" );
+            return Response.AsJson( new { code = HttpStatusCode.OK, message = "Not", body = "False" } );
           }
 
         }
-        catch (Exception ex)
+        catch( Exception ex )
         {
-                //log.Debug( "Get User Failed : " + ex.Message );
-                log.Fatal("Error:/dev/getSerialKeyIsExist", ex);
-          return Response.AsJson(new { code = HttpStatusCode.NotFound, message = "Data Not Found", body = string.Empty });
+          //log.Debug( "Get User Failed : " + ex.Message );
+          log.Fatal( "Error:/dev/getSerialKeyIsExist", ex );
+          return Response.AsJson( new { code = HttpStatusCode.NotFound, message = "Data Not Found", body = string.Empty } );
         }
       };
 
       Get["/dev/GetUrlApi"] = parameter =>
       {
-        log.Debug("Start:/dev/GetUrlApi");
+        log.Debug( "Start:/dev/GetUrlApi" );
         string urlApi = string.Empty;
         urlApi = _userActivityBusiness.GetUrlApi();
         try
         {
-          var jsonBody = JsonConvert.SerializeObject(urlApi);
-          return Response.AsJson(new { code = HttpStatusCode.OK, message = "Ok", body = jsonBody });
+          var jsonBody = JsonConvert.SerializeObject( urlApi );
+          return Response.AsJson( new { code = HttpStatusCode.OK, message = "Ok", body = jsonBody } );
         }
-        catch (Exception ex)
+        catch( Exception ex )
         {
-          return Response.AsJson(new { code = HttpStatusCode.InternalServerError, message = $"Error, {ex.Message}", body = string.Empty });
+          return Response.AsJson( new { code = HttpStatusCode.InternalServerError, message = $"Error, {ex.Message}", body = string.Empty } );
         }
 
       };
 
       Get["/dev/GetTarifPajak"] = parameter =>
       {
-        log.Debug("Start:/dev/GetTarifPajak");
+        log.Debug( "Start:/dev/GetTarifPajak" );
         List<JenisPajak> lstPajak = new List<JenisPajak>();
         try
         {
-                //Get All Tarif Pajak
-                lstPajak = _userSettingColumnBusiness.RetrieveTarifAll();
-          log.Debug("Get tarif pajak success");
+          //Get All Tarif Pajak
+          lstPajak = _userSettingColumnBusiness.RetrieveTarifAll();
+          log.Debug( "Get tarif pajak success" );
         }
-        catch (Exception ex)
+        catch( Exception ex )
         {
-          log.Fatal("Error:/dev/GetTarifPajak", ex);
-          return Response.AsJson(new { code = HttpStatusCode.NotFound, message = "Data Not Found", body = string.Empty });
+          log.Fatal( "Error:/dev/GetTarifPajak", ex );
+          return Response.AsJson( new { code = HttpStatusCode.NotFound, message = "Data Not Found", body = string.Empty } );
         }
 
-        var jsonBody = JsonConvert.SerializeObject(lstPajak);
-        return Response.AsJson(new { code = HttpStatusCode.OK, message = "OK", body = jsonBody });
+        var jsonBody = JsonConvert.SerializeObject( lstPajak );
+        return Response.AsJson( new { code = HttpStatusCode.OK, message = "OK", body = jsonBody } );
       };
 
       Post["/dev/postLastErrorDate"] = parameter =>
       {
         try
         {
-          log.Info("Start : /dev/postLastErrorDate");
+          log.Info( "Start : /dev/postLastErrorDate" );
           string ip = Request.UserHostAddress;
-          string body = Nancy.IO.RequestStream.FromStream(Request.Body).AsString();
-          log.Info("Deserialize object from json body");
-          var setting = JsonConvert.DeserializeObject<string>(body);
-                //Get Last Error Date By status_error
-                LastErrorResponse resp = new LastErrorResponse();
+          string body = Nancy.IO.RequestStream.FromStream( Request.Body ).AsString();
+          log.Info( "Deserialize object from json body" );
+          var setting = JsonConvert.DeserializeObject<string>( body );
+          //Get Last Error Date By status_error
+          LastErrorResponse resp = new LastErrorResponse();
           resp.TanggalError = DateTime.Now.Date;
 
-          resp.TanggalError = _userActivityBusiness.GetLastErrorDate(setting);
+          resp.TanggalError = _userActivityBusiness.GetLastErrorDate( setting );
 
-          var jsonBody = JsonConvert.SerializeObject(resp);
-          log.Info("End : /dev/postLastErrorDate");
-          return Response.AsJson(new { code = HttpStatusCode.OK, body = jsonBody });
+          var jsonBody = JsonConvert.SerializeObject( resp );
+          log.Info( "End : /dev/postLastErrorDate" );
+          return Response.AsJson( new { code = HttpStatusCode.OK, body = jsonBody } );
         }
-        catch (Exception ex)
+        catch( Exception ex )
         {
-          log.Fatal("Error : /dev/postLastErrorDate", ex);
-          return Response.AsJson(new { code = HttpStatusCode.InternalServerError, message = $"Error, {ex.Message}" });
+          log.Fatal( "Error : /dev/postLastErrorDate", ex );
+          return Response.AsJson( new { code = HttpStatusCode.InternalServerError, message = $"Error, {ex.Message}" } );
           throw;
         }
       };
@@ -170,41 +170,41 @@ namespace POProject.API.Module
       {
         try
         {
-          log.Info("Start : /dev/postSettingClient");
-          log.Info($"incoming request from IP:{this.Request.UserHostAddress}");
-          string body = Nancy.IO.RequestStream.FromStream(Request.Body).AsString();
-          log.Info("Deserialize object from json body");
-          JsonSetting setting = JsonConvert.DeserializeObject<JsonSetting>(body);
+          log.Info( "Start : /dev/postSettingClient" );
+          log.Info( $"incoming request from IP:{this.Request.UserHostAddress}" );
+          string body = Nancy.IO.RequestStream.FromStream( Request.Body ).AsString();
+          log.Info( "Deserialize object from json body" );
+          JsonSetting setting = JsonConvert.DeserializeObject<JsonSetting>( body );
 
-                #region Inserting Data Setting Client
-                log.Info("Inserting data setting client");
+          #region Inserting Data Setting Client
+          log.Info( "Inserting data setting client" );
           string username = string.Empty;
-          foreach (var item in setting.list_user)
+          foreach( var item in setting.list_user )
           {
-            _settingClientBusiness.InsertUserClient(item.userName, item.idMachine, item.guid, item.phone, item.mail, item.port);
+            _settingClientBusiness.InsertUserClient( item.userName, item.idMachine, item.guid, item.phone, item.mail, item.port );
             username = item.userName;
           }
-          foreach (var item in setting.list_nop)
+          foreach( var item in setting.list_nop )
           {
-            _settingClientBusiness.InsertUserNop(username, item.nop, item.jenisPajak);
+            _settingClientBusiness.InsertUserNop( username, item.nop, item.jenisPajak );
           }
 
-          foreach (var item in setting.settings)
+          foreach( var item in setting.settings )
           {
-            _settingClientBusiness.InsertUserSettingColumn(username, item.nop, item.column_name, item.column_text);
+            _settingClientBusiness.InsertUserSettingColumn( username, item.nop, item.column_name, item.column_text );
           }
-                #endregion
+          #endregion
 
-                //insert xmlcontent
-                _settingClientBusiness.InsertXmlFile(username, "setUpload.xml", setting.xml_content, setting.jenFile, setting.separator);
+          //insert xmlcontent
+          _settingClientBusiness.InsertXmlFile( username, "setUpload.xml", setting.xml_content, setting.jenFile, setting.separator );
 
-          log.Info("End : /dev/postSettingClient");
-          return Response.AsJson(new { code = HttpStatusCode.OK });
+          log.Info( "End : /dev/postSettingClient" );
+          return Response.AsJson( new { code = HttpStatusCode.OK } );
         }
-        catch (System.Exception ex)
+        catch( System.Exception ex )
         {
-          log.Fatal("Error : /dev/postSettingClient", ex);
-          return Response.AsJson(new { code = HttpStatusCode.InternalServerError, message = $"Error, {ex.Message}" });
+          log.Fatal( "Error : /dev/postSettingClient", ex );
+          return Response.AsJson( new { code = HttpStatusCode.InternalServerError, message = $"Error, {ex.Message}" } );
           throw;
         }
       };
@@ -213,42 +213,42 @@ namespace POProject.API.Module
       {
         try
         {
-          log.Info("Start : /dev/postSettingClientWithParam");
-          log.Info($"incoming request from IP:{this.Request.UserHostAddress}");
-          var body = Nancy.IO.RequestStream.FromStream(Request.Body).AsString();
-          log.Info("Deserialize object from json body");
-          User user = JsonConvert.DeserializeObject<User>(body);
+          log.Info( "Start : /dev/postSettingClientWithParam" );
+          log.Info( $"incoming request from IP:{this.Request.UserHostAddress}" );
+          var body = Nancy.IO.RequestStream.FromStream( Request.Body ).AsString();
+          log.Info( "Deserialize object from json body" );
+          User user = JsonConvert.DeserializeObject<User>( body );
 
-                //Retrieve Data User Setting
-                if (user != null)
+          //Retrieve Data User Setting
+          if( user != null )
           {
-            log.Info("Checking user exist");
-            UserClient userClient = _settingClientBusiness.RetrieveUserClient(user.userName, user.idMachine, user.guid).FirstOrDefault();
-            if (userClient != null)
+            log.Info( "Checking user exist" );
+            UserClient userClient = _settingClientBusiness.RetrieveUserClient( user.userName, user.idMachine, user.guid ).FirstOrDefault();
+            if( userClient != null )
             {
-              log.Info("Retrieve data setting client from database");
-              List<UserSettingColumn> listSettingColumn = _userSettingColumnBusiness.RetrieveSettingColumnByUsername(userClient.Username);
-              log.Info("Serialize data to json");
-              var jsonBody = JsonConvert.SerializeObject(listSettingColumn);
-              log.Info("End : /dev/postSettingClientWithParam");
-              return Response.AsJson(new { code = HttpStatusCode.OK, message = "Success", body = jsonBody });
+              log.Info( "Retrieve data setting client from database" );
+              List<UserSettingColumn> listSettingColumn = _userSettingColumnBusiness.RetrieveSettingColumnByUsername( userClient.Username );
+              log.Info( "Serialize data to json" );
+              var jsonBody = JsonConvert.SerializeObject( listSettingColumn );
+              log.Info( "End : /dev/postSettingClientWithParam" );
+              return Response.AsJson( new { code = HttpStatusCode.OK, message = "Success", body = jsonBody } );
             }
             else
             {
-              log.Info("End : /dev/postSettingClientWithParam");
-              return Response.AsJson(new { code = HttpStatusCode.NotFound, message = "Data Not Found", body = string.Empty });
+              log.Info( "End : /dev/postSettingClientWithParam" );
+              return Response.AsJson( new { code = HttpStatusCode.NotFound, message = "Data Not Found", body = string.Empty } );
             }
           }
           else
           {
-            log.Info("End : /dev/postSettingClientWithParam");
-            return Response.AsJson(new { code = HttpStatusCode.Unauthorized, message = "Failed", body = string.Empty });
+            log.Info( "End : /dev/postSettingClientWithParam" );
+            return Response.AsJson( new { code = HttpStatusCode.Unauthorized, message = "Failed", body = string.Empty } );
           }
         }
-        catch (Exception ex)
+        catch( Exception ex )
         {
-          log.Fatal("Error : /dev/postSettingClientWithParam", ex);
-          return Response.AsJson(new { code = HttpStatusCode.BadRequest, message = $"Error, {ex.Message}", body = string.Empty });
+          log.Fatal( "Error : /dev/postSettingClientWithParam", ex );
+          return Response.AsJson( new { code = HttpStatusCode.BadRequest, message = $"Error, {ex.Message}", body = string.Empty } );
         }
       };
 
@@ -256,11 +256,11 @@ namespace POProject.API.Module
       {
         try
         {
-          log.Info("Start : /dev/postTransactionClient");
+          log.Info( "Start : /dev/postTransactionClient" );
           string ip = this.Request.UserHostAddress;
-          log.Info($"incoming request from IP:{ip}");
-          string body = Nancy.IO.RequestStream.FromStream(Request.Body).AsString();
-          JsonData jsonData = JsonConvert.DeserializeObject<JsonData>(body);
+          log.Info( $"incoming request from IP:{ip}" );
+          string body = Nancy.IO.RequestStream.FromStream( Request.Body ).AsString();
+          JsonData jsonData = JsonConvert.DeserializeObject<JsonData>( body );
 
           string username = string.Empty;
           string CultureInfos = string.Empty;
@@ -269,7 +269,7 @@ namespace POProject.API.Module
           string bulan = jsonData.masapajak.FirstOrDefault().bulan;
           string tahun = jsonData.masapajak.FirstOrDefault().tahun;
           CultureInfos = jsonData.items.CultureInfos;
-          log.Info("generating file json to xml");
+          log.Info( "generating file json to xml" );
 
           DataTable dtTransaksi = new DataTable();
           DataTable dtLampiran = new DataTable();
@@ -277,27 +277,27 @@ namespace POProject.API.Module
           dtLampiran.CaseSensitive = false;
 
 
-          if (jsonData.items.dtLampiran != null && jsonData.items.dtLampiran.Rows.Count > 0)
+          if( jsonData.items.dtLampiran != null && jsonData.items.dtLampiran.Rows.Count > 0 )
             dtTransaksi = jsonData.items.dtPajak;
           else
           {
-            log.Info("Data tidak ditemukan ............");
-            return Response.AsJson(new { code = HttpStatusCode.NotFound, message = $"Error, {"Data tidak ditemukan."}" });
+            log.Info( "Data tidak ditemukan ............" );
+            return Response.AsJson( new { code = HttpStatusCode.NotFound, message = $"Error, {"Data tidak ditemukan."}" } );
           }
 
-          if (jsonData.items.dtLampiran != null && jsonData.items.dtLampiran.Rows.Count > 0)
+          if( jsonData.items.dtLampiran != null && jsonData.items.dtLampiran.Rows.Count > 0 )
             dtLampiran = jsonData.items.dtLampiran;
           else
             dtLampiran = dtTransaksi.Copy();
 
           List<UserSettingColumn> lstColumnName = new List<UserSettingColumn>();
-          lstColumnName = _settingClientBusiness.RetrieveUserSettingColumn(username, dtLampiran.Rows[0]["NOP"].ToString());
-          string teksTanggal = lstColumnName.Where(m => m.Column_Name.ToUpper().Equals("TGL_TRANSAKSI")).Select(m => m.Column_Text).FirstOrDefault();
-          if (string.IsNullOrEmpty(teksTanggal))
+          lstColumnName = _settingClientBusiness.RetrieveUserSettingColumn( username, dtLampiran.Rows[0]["NOP"].ToString() );
+          string teksTanggal = lstColumnName.Where( m => m.Column_Name.ToUpper().Equals( "TGL_TRANSAKSI" ) ).Select( m => m.Column_Text ).FirstOrDefault();
+          if( string.IsNullOrEmpty( teksTanggal ) )
             teksTanggal = "TGL_TRANSAKSI";
 
-                #region Delete Null Rows in First column
-                DataView dv = dtTransaksi.AsDataView();
+          #region Delete Null Rows in First column
+          DataView dv = dtTransaksi.AsDataView();
           dv.RowFilter = teksTanggal + " IS NOT NULL";
           dtTransaksi = dv.ToTable();
 
@@ -305,99 +305,99 @@ namespace POProject.API.Module
           dv = dtLampiran.AsDataView();
           dv.RowFilter = teksTanggal + " IS NOT NULL";
           dtLampiran = dv.ToTable();
-                #endregion
+          #endregion
 
-                string nop = string.Empty;
+          string nop = string.Empty;
           bool isFromDatabase = false;
           DataColumnCollection col = dtLampiran.Columns;
           List<string> lstDistNopLampiran = null;
-          if (col.Contains("NOP_LAMPIRAN"))
+          if( col.Contains( "NOP_LAMPIRAN" ) )
           {
-            lstDistNopLampiran = dtLampiran.AsEnumerable().Select(r => r.Field<string>("NOP_LAMPIRAN")).Distinct().ToList();
+            lstDistNopLampiran = dtLampiran.AsEnumerable().Select( r => r.Field<string>( "NOP_LAMPIRAN" ) ).Distinct().ToList();
             isFromDatabase = true;
             dtLampiran.Columns["NOP"].ColumnName = "NOP_ALIAS";
             dtLampiran.Columns["NOP_LAMPIRAN"].ColumnName = "NOP";
           }
           else
-            lstDistNopLampiran = dtLampiran.AsEnumerable().Select(r => r.Field<string>("NOP").Trim()).Distinct().ToList();
+            lstDistNopLampiran = dtLampiran.AsEnumerable().Select( r => r.Field<string>( "NOP" ).Trim() ).Distinct().ToList();
 
-          if (lstDistNopLampiran == null || lstDistNopLampiran.Count <= 0)
+          if( lstDistNopLampiran == null || lstDistNopLampiran.Count <= 0 )
           {
-            log.Info("List Nop tidak ditemukan ............");
-            return Response.AsJson(new { code = HttpStatusCode.NotFound, message = $"Error, List Nop tidak ditemukan." });
+            log.Info( "List Nop tidak ditemukan ............" );
+            return Response.AsJson( new { code = HttpStatusCode.NotFound, message = $"Error, List Nop tidak ditemukan." } );
           }
 
 
           List<string> lstNopBlokir = new List<string>();
-          foreach (var itemNopLampiran in lstDistNopLampiran)
+          foreach( var itemNopLampiran in lstDistNopLampiran )
           {
             nop = itemNopLampiran;
             string queryPajak = string.Empty;
 
-                  //Validate Query
-                  if (isFromDatabase)
+            //Validate Query
+            if( isFromDatabase )
             {
-              List<BusinessLogic.queryData> queryLst = _userSettingColumnBusiness.RetrieveQueryPajak(username, nop);
-              if (queryLst != null && queryLst.Count > 0)
+              List<BusinessLogic.queryData> queryLst = _userSettingColumnBusiness.RetrieveQueryPajak( username, nop );
+              if( queryLst != null && queryLst.Count > 0 )
               {
                 bool isQueryValid = true;
-                string queryPajakFromXml = Regex.Replace(jsonData.items.lstQuery.FirstOrDefault().queryPajak, @"\s+", string.Empty);
-                string queryPajakFromDB = Regex.Replace(queryLst.FirstOrDefault().queryPajak, @"\s+", string.Empty);
+                string queryPajakFromXml = Regex.Replace( jsonData.items.lstQuery.FirstOrDefault().queryPajak, @"\s+", string.Empty );
+                string queryPajakFromDB = Regex.Replace( queryLst.FirstOrDefault().queryPajak, @"\s+", string.Empty );
                 queryPajak = jsonData.items.lstQuery.FirstOrDefault().queryPajak;
-                string queryLampiranFromXml = Regex.Replace(jsonData.items.lstQuery.FirstOrDefault().queryLampiran, @"\s+", string.Empty);
-                string queryLampiranFromDB = Regex.Replace(queryLst.FirstOrDefault().queryLampiran, @"\s+", string.Empty);
+                string queryLampiranFromXml = Regex.Replace( jsonData.items.lstQuery.FirstOrDefault().queryLampiran, @"\s+", string.Empty );
+                string queryLampiranFromDB = Regex.Replace( queryLst.FirstOrDefault().queryLampiran, @"\s+", string.Empty );
 
-                if (!string.Equals(queryPajakFromDB, queryPajakFromXml, StringComparison.OrdinalIgnoreCase))
+                if( !string.Equals( queryPajakFromDB, queryPajakFromXml, StringComparison.OrdinalIgnoreCase ) )
                 {
                   isQueryValid = false;
                 }
 
-                if (!string.Equals(queryLampiranFromXml, queryLampiranFromDB, StringComparison.OrdinalIgnoreCase))
+                if( !string.Equals( queryLampiranFromXml, queryLampiranFromDB, StringComparison.OrdinalIgnoreCase ) )
                 {
                   isQueryValid = false;
                 }
 
-                if (!isQueryValid)
+                if( !isQueryValid )
                 {
-                        //insert tanggal_error into user_temp_error
-                        DateTime dtmlastTime = dtTransaksi.AsEnumerable().Select(x => x.Field<DateTime>("TGL_TRANSAKSI")).FirstOrDefault();
-                  _userActivityBusiness.InsertUserActivity(username, ip, DateTime.Now, true, "Query tidak sesuai");
-                  log.Info("Query tidak sesuai, mohon periksa kembali. ............");
-                  return Response.AsJson(new { code = HttpStatusCode.InternalServerError, message = $"Error, Query tidak sesuai, mohon periksa kembali." });
+                  //insert tanggal_error into user_temp_error
+                  DateTime dtmlastTime = dtTransaksi.AsEnumerable().Select( x => x.Field<DateTime>( "TGL_TRANSAKSI" ) ).FirstOrDefault();
+                  _userActivityBusiness.InsertUserActivity( username, ip, DateTime.Now, true, "Query tidak sesuai" );
+                  log.Info( "Query tidak sesuai, mohon periksa kembali. ............" );
+                  return Response.AsJson( new { code = HttpStatusCode.InternalServerError, message = $"Error, Query tidak sesuai, mohon periksa kembali." } );
                 }
               }
               else
               {
-                log.Info("Query pada username dan nop tersebut tidak ditemukan ............");
-                return Response.AsJson(new { code = HttpStatusCode.NotFound, message = $"Error, Query pada username dan nop tersebut tidak ditemukan." });
+                log.Info( "Query pada username dan nop tersebut tidak ditemukan ............" );
+                return Response.AsJson( new { code = HttpStatusCode.NotFound, message = $"Error, Query pada username dan nop tersebut tidak ditemukan." } );
               }
             }
 
             List<Transaction> lstTransaksi = new List<Transaction>();
-                  //Get nama kolom tanggal transaksi 
-                  List<UserSettingColumn> lstKolomName = new List<UserSettingColumn>();
+            //Get nama kolom tanggal transaksi 
+            List<UserSettingColumn> lstKolomName = new List<UserSettingColumn>();
             string namaKolomTanggal = string.Empty;
-            if (!isFromDatabase)
+            if( !isFromDatabase )
             {
-              lstKolomName = _userSettingColumnBusiness.RetrieveColumnByUserNop(username, nop);
+              lstKolomName = _userSettingColumnBusiness.RetrieveColumnByUserNop( username, nop );
             }
             else
             {
               DataColumnCollection colTrans = dtTransaksi.Columns;
-              foreach (var itemKolom in colTrans)
+              foreach( var itemKolom in colTrans )
               {
                 UserSettingColumn userKolom = new UserSettingColumn();
                 userKolom.Username = username;
                 userKolom.Nop = nop;
                 userKolom.Column_Name = itemKolom.ToString();
                 userKolom.Column_Text = itemKolom.ToString();
-                lstKolomName.Add(userKolom);
+                lstKolomName.Add( userKolom );
               }
             }
 
-            namaKolomTanggal = lstKolomName.Where(m => m.Column_Name.ToUpper().Contains("TGL_TRANSAKSI")).Select(m => m.Column_Text.ToUpper()).FirstOrDefault();
+            namaKolomTanggal = lstKolomName.Where( m => m.Column_Name.ToUpper().Contains( "TGL_TRANSAKSI" ) ).Select( m => m.Column_Text.ToUpper() ).FirstOrDefault();
 
-            List<string> namaKolomNilai = lstKolomName.Where(m => m.Column_Name.ToUpper().Contains("PAJAK")).Select(m => m.Column_Text.ToUpper()).ToList();
+            List<string> namaKolomNilai = lstKolomName.Where( m => m.Column_Name.ToUpper().Contains( "PAJAK" ) ).Select( m => m.Column_Text.ToUpper() ).ToList();
             DataView dvTrans = dtTransaksi.DefaultView;
             dvTrans.RowFilter = "NOP=" + nop;
             dvTrans.Sort = namaKolomTanggal;
@@ -412,18 +412,18 @@ namespace POProject.API.Module
             int oldThn = 0;
             bool isOnDetail = false;
 
-            foreach (DataRow dRow in dtSortTransaction.Rows)
+            foreach( DataRow dRow in dtSortTransaction.Rows )
             {
               DateTime tanggal = dRow[namaKolomTanggal].AsDateTime();
               int mp = tanggal.Month;
               int thn = tanggal.Year;
-                    //check sptpd is generate
-                    if (string.Compare(oldNop, dRow["NOP"].ToString()) != 0)
+              //check sptpd is generate
+              if( string.Compare( oldNop, dRow["NOP"].ToString() ) != 0 )
               {
-                if (oldMP != mp)
+                if( oldMP != mp )
                 {
-                  if (oldThn != thn)
-                    isOnDetail = _sPTPDDetailBusiness.isSptpdDetailByNop(dRow["NOP"].ToString(), mp, thn);
+                  if( oldThn != thn )
+                    isOnDetail = _sPTPDDetailBusiness.isSptpdDetailByNop( dRow["NOP"].ToString(), mp, thn );
                 }
                 oldNop = dRow["NOP"].ToString();
                 oldMP = mp;
@@ -437,9 +437,9 @@ namespace POProject.API.Module
               }
 
 
-              if (isOnDetail)
+              if( isOnDetail )
               {
-                lstNopBlokir.Add(dRow["NOP"].ToString());
+                lstNopBlokir.Add( dRow["NOP"].ToString() );
                 isNopBlokir = true;
                 break;
               }
@@ -448,43 +448,43 @@ namespace POProject.API.Module
 
               try
               {
-                for (int iNilai = 0; iNilai < namaKolomNilai.Count; iNilai++)
+                for( int iNilai = 0; iNilai < namaKolomNilai.Count; iNilai++ )
                 {
-                  if (string.Compare(namaKolomNilai[iNilai].ToString(), "-") != 0)
+                  if( string.Compare( namaKolomNilai[iNilai].ToString(), "-" ) != 0 )
                     nilaiPajak += dRow[namaKolomNilai[iNilai]].AsDouble();
                 }
               }
-              catch (Exception ex)
+              catch( Exception ex )
               {
                 throw ex;
               }
 
-              if (tglOld.Year == 1)
+              if( tglOld.Year == 1 )
               {
                 tglOld = tanggal;
                 nilaiOld = nilaiPajak;
-                if (dRow == last)
+                if( dRow == last )
                 {
                   Transaction itemTrans = new Transaction();
                   itemTrans = new Transaction();
                   itemTrans.tanggal = tglOld;
                   itemTrans.total = nilaiOld;
-                  lstTransaksi.Add(itemTrans);
+                  lstTransaksi.Add( itemTrans );
                   break;
                 }
               }
               else
               {
-                if (tglOld.Date == tanggal.Date)
+                if( tglOld.Date == tanggal.Date )
                 {
-                  if (dRow == last)
+                  if( dRow == last )
                   {
                     nilaiOld += nilaiPajak;
                     Transaction itemTrans = new Transaction();
                     itemTrans = new Transaction();
                     itemTrans.tanggal = tglOld;
                     itemTrans.total = nilaiOld;
-                    lstTransaksi.Add(itemTrans);
+                    lstTransaksi.Add( itemTrans );
                     break;
                   }
 
@@ -495,64 +495,64 @@ namespace POProject.API.Module
                   Transaction itemTrans = new Transaction();
                   itemTrans.tanggal = tglOld;
                   itemTrans.total = nilaiOld;
-                  lstTransaksi.Add(itemTrans);
+                  lstTransaksi.Add( itemTrans );
 
                   tglOld = tanggal.Date;
                   nilaiOld = nilaiPajak;
 
-                  if (dRow == last)
+                  if( dRow == last )
                   {
                     itemTrans = new Transaction();
                     itemTrans.tanggal = tglOld;
                     itemTrans.total = nilaiOld;
-                    lstTransaksi.Add(itemTrans);
+                    lstTransaksi.Add( itemTrans );
                   }
                 }
               }
             }
 
-            if (isNopBlokir)
+            if( isNopBlokir )
               continue;
 
-            log.Info("inserting data to user transaction");
-                  //cek transaction isExist
-                  IEnumerable<UserTransaction> lstTransExist = new List<UserTransaction>();
-            lstTransExist = _userTransactionBusiness.RetrieveUserTransactionByMonth(username, lstTransaksi.FirstOrDefault().tanggal.Month, lstTransaksi.FirstOrDefault().tanggal.Year);
+            log.Info( "inserting data to user transaction" );
+            //cek transaction isExist
+            IEnumerable<UserTransaction> lstTransExist = new List<UserTransaction>();
+            lstTransExist = _userTransactionBusiness.RetrieveUserTransactionByMonth( username, lstTransaksi.FirstOrDefault().tanggal.Month, lstTransaksi.FirstOrDefault().tanggal.Year );
 
-                  //insert into user_transaction
-                  foreach (var item in lstTransaksi)
+            //insert into user_transaction
+            foreach( var item in lstTransaksi )
             {
-              bool isExist = lstTransExist.Where(m => string.Compare(m.Tanggal.ToString("dd-MM-yyyy"), item.tanggal.ToString("dd-MM-yyyy")) == 0 &&
-                    m.Nop.Equals(nop)).ToList().Count > 0;
+              bool isExist = lstTransExist.Where( m => string.Compare( m.Tanggal.ToString( "dd-MM-yyyy" ), item.tanggal.ToString( "dd-MM-yyyy" ) ) == 0 &&
+                     m.Nop.Equals( nop ) ).ToList().Count > 0;
               try
               {
-                if (isExist)
+                if( isExist )
                 {
-                  log.Info("update data from user " + username);
-                  _userTransactionBusiness.UpdatePajakUserTransaction(username, nop, item.tanggal, item.total);
+                  log.Info( "update data from user " + username );
+                  _userTransactionBusiness.UpdatePajakUserTransaction( username, nop, item.tanggal, item.total );
                 }
                 else
                 {
-                  log.Info("insert data from user " + username);
-                  _userTransactionBusiness.InsertUserTransaction(username, item.tanggal, item.total, ip, string.Empty, false, nop);
+                  log.Info( "insert data from user " + username );
+                  _userTransactionBusiness.InsertUserTransaction( username, item.tanggal, item.total, ip, string.Empty, false, nop );
                 }
               }
-              catch (Exception ex)
+              catch( Exception ex )
               {
-                log.Info("insert or update error : " + ex.Message);
+                log.Info( "insert or update error : " + ex.Message );
               }
             }
 
-            log.Info("inserting data to user transaction detail");
-                  //insert into user_transaction_detail
-                  string dir = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "transaction.xml");
+            log.Info( "inserting data to user transaction detail" );
+            //insert into user_transaction_detail
+            string dir = System.IO.Path.Combine( AppDomain.CurrentDomain.BaseDirectory, "transaction.xml" );
 
-                  //Replace nama kolom untuk no_invoice dan tgl_transaksi
-                  if (!isFromDatabase)
+            //Replace nama kolom untuk no_invoice dan tgl_transaksi
+            if( !isFromDatabase )
             {
-              List<UserSettingColumn> lstSetCol = _settingClientBusiness.RetrieveUserSettingColumn(username, nop);
-              string noInvoice = lstSetCol.Where(x => x.Column_Name.ToUpper().Equals("NO_INVOICE")).Select(x => x.Column_Text.ToUpper()).FirstOrDefault();
-              string tglTransaksi = lstSetCol.Where(x => x.Column_Name.ToUpper().Equals("TGL_TRANSAKSI")).Select(x => x.Column_Text.ToUpper()).FirstOrDefault();
+              List<UserSettingColumn> lstSetCol = _settingClientBusiness.RetrieveUserSettingColumn( username, nop );
+              string noInvoice = lstSetCol.Where( x => x.Column_Name.ToUpper().Equals( "NO_INVOICE" ) ).Select( x => x.Column_Text.ToUpper() ).FirstOrDefault();
+              string tglTransaksi = lstSetCol.Where( x => x.Column_Name.ToUpper().Equals( "TGL_TRANSAKSI" ) ).Select( x => x.Column_Text.ToUpper() ).FirstOrDefault();
 
               dtLampiran.Columns[noInvoice].ColumnName = "NO_INVOICE";
               dtLampiran.Columns[tglTransaksi].ColumnName = "TGL_TRANSAKSI";
@@ -561,154 +561,154 @@ namespace POProject.API.Module
 
             string colTglName = "TGL_TRANSAKSI";
 
-                  //Pecah dan simpan sesuai tanggal transaksi
-                  #region Old Code
-                  //string[] arrSelect = queryPajak.ToUpper().Split(new string[] { "FROM" }, StringSplitOptions.None);
-                  //string[] arrSplit = arrSelect[0].Split(',');
-                  //string dbColDateName = string.Empty;
-                  //if (isFromDatabase)
-                  //{
-                  //    foreach (string item in arrSplit)
-                  //    {
-                  //        if (item.Contains("TGL_TRANSAKSI"))
-                  //        {
-                  //            dbColDateName = item;
-                  //            break;
-                  //        }
-                  //    }
-                  //}
-                  //else
-                  //{
-                  //    dbColDateName = namaKolomTanggal;
-                  //}
+            //Pecah dan simpan sesuai tanggal transaksi
+            #region Old Code
+            //string[] arrSelect = queryPajak.ToUpper().Split(new string[] { "FROM" }, StringSplitOptions.None);
+            //string[] arrSplit = arrSelect[0].Split(',');
+            //string dbColDateName = string.Empty;
+            //if (isFromDatabase)
+            //{
+            //    foreach (string item in arrSplit)
+            //    {
+            //        if (item.Contains("TGL_TRANSAKSI"))
+            //        {
+            //            dbColDateName = item;
+            //            break;
+            //        }
+            //    }
+            //}
+            //else
+            //{
+            //    dbColDateName = namaKolomTanggal;
+            //}
 
 
-                  //string[] arrTglName = dbColDateName.Replace("SELECT ", string.Empty).Split(' ');
-                  //string colTglName = string.Empty;
-                  //if (arrTglName.Count() > 1)
-                  //    colTglName = arrTglName[arrTglName.Count() - 2];
-                  //else
-                  //    colTglName = arrTglName[0];
+            //string[] arrTglName = dbColDateName.Replace("SELECT ", string.Empty).Split(' ');
+            //string colTglName = string.Empty;
+            //if (arrTglName.Count() > 1)
+            //    colTglName = arrTglName[arrTglName.Count() - 2];
+            //else
+            //    colTglName = arrTglName[0];
 
-                  //if (string.IsNullOrEmpty(colTglName))
-                  //{
-                  //    if (string.IsNullOrEmpty(queryPajak))
-                  //        colTglName = "TGL_TRANSAKSI";
-                  //}
-                  #endregion
+            //if (string.IsNullOrEmpty(colTglName))
+            //{
+            //    if (string.IsNullOrEmpty(queryPajak))
+            //        colTglName = "TGL_TRANSAKSI";
+            //}
+            #endregion
 
-                  //DataView dvTrans = new DataView(dtLampiran);
-                  //dvTrans.RowFilter = $"NOP={nop}";
-                  //DataTable dtDistDate = dvTrans.ToTable(true, colTglName);                        
+            //DataView dvTrans = new DataView(dtLampiran);
+            //dvTrans.RowFilter = $"NOP={nop}";
+            //DataTable dtDistDate = dvTrans.ToTable(true, colTglName);                        
 
-                  DataTable dtTransByNop = dtLampiran.AsEnumerable().Where(m => m.Field<string>("NOP").Equals(nop)).CopyToDataTable();
+            DataTable dtTransByNop = dtLampiran.AsEnumerable().Where( m => m.Field<string>( "NOP" ).Equals( nop ) ).CopyToDataTable();
             DataTable dtDistDate = new DataTable();
-            dtDistDate.Columns.Add(colTglName, typeof(DateTime));
+            dtDistDate.Columns.Add( colTglName, typeof( DateTime ) );
 
-            if (dtTransByNop.Columns[colTglName].DataType != typeof(DateTime))
+            if( dtTransByNop.Columns[colTglName].DataType != typeof( DateTime ) )
             {
               DataTable copyTransTable = dtTransByNop.Clone();
-              copyTransTable.Columns[colTglName].DataType = typeof(DateTime);
+              copyTransTable.Columns[colTglName].DataType = typeof( DateTime );
 
-              foreach (DataRow item in dtTransByNop.Rows)
+              foreach( DataRow item in dtTransByNop.Rows )
               {
                 DataRow nRowTransTable = copyTransTable.NewRow();
                 nRowTransTable.ItemArray = item.ItemArray;
-                copyTransTable.Rows.Add(nRowTransTable);
+                copyTransTable.Rows.Add( nRowTransTable );
               }
 
               dtTransByNop = copyTransTable;
             }
 
             DateTime oldDate = DateTime.MinValue;
-            foreach (DataRow item in dtTransByNop.Rows)
+            foreach( DataRow item in dtTransByNop.Rows )
             {
-                    //if (Convert.ToInt32(item["NO"]) == 1168)
-                    //{
+              //if (Convert.ToInt32(item["NO"]) == 1168)
+              //{
 
-                    //}
+              //}
 
 
-                    DateTime newDate = Convert.ToDateTime(item["TGL_TRANSAKSI"]).Date;
-              if (string.Compare(oldDate.ToString("dd-MM-yyyy"), newDate.ToString("dd-MM-yyyy")) != 0)
+              DateTime newDate = Convert.ToDateTime( item["TGL_TRANSAKSI"] ).Date;
+              if( string.Compare( oldDate.ToString( "dd-MM-yyyy" ), newDate.ToString( "dd-MM-yyyy" ) ) != 0 )
               {
                 DataRow newRow = dtDistDate.NewRow();
                 newRow[colTglName] = newDate;
-                dtDistDate.Rows.Add(newRow);
+                dtDistDate.Rows.Add( newRow );
                 oldDate = newDate;
               }
             }
 
-            foreach (DataRow dRow in dtDistDate.Rows)
+            foreach( DataRow dRow in dtDistDate.Rows )
             {
               DataSet ds = new DataSet();
               DateTime tglTrans = DateTime.MinValue;
               try
               {
-                tglTrans = Convert.ToDateTime(dRow[colTglName], new CultureInfo(CultureInfos));
+                tglTrans = Convert.ToDateTime( dRow[colTglName], new CultureInfo( CultureInfos ) );
               }
-              catch (Exception ex)
+              catch( Exception ex )
               {
-                log.Info("Date format error......" + ex.Message);
+                log.Info( "Date format error......" + ex.Message );
               }
 
 
               DataView vw = dtTransByNop.AsDataView();
 
-              string startDate = tglTrans.ToString("MM/dd/yyyy 00:00:00", new CultureInfo("en-US"));
-              string endDate = tglTrans.ToString("MM/dd/yyyy 23:59:59", new CultureInfo("en-US"));
+              string startDate = tglTrans.ToString( "MM/dd/yyyy 00:00:00", new CultureInfo( "en-US" ) );
+              string endDate = tglTrans.ToString( "MM/dd/yyyy 23:59:59", new CultureInfo( "en-US" ) );
 
-              string filter = string.Format(colTglName + " >= #{0}# AND " + colTglName + "<=#{1}#",
-                       startDate, endDate);
+              string filter = string.Format( colTglName + " >= #{0}# AND " + colTglName + "<=#{1}#",
+                       startDate, endDate );
               vw.RowFilter = filter;
 
-              ds.Tables.Add(vw.ToTable());
-              ds.WriteXml(dir);
+              ds.Tables.Add( vw.ToTable() );
+              ds.WriteXml( dir );
 
-              string xmlString = System.IO.File.ReadAllText(dir);
+              string xmlString = System.IO.File.ReadAllText( dir );
               string nopDetail = string.Empty;
-                    //Cek username, nop, bulan and tahun is exist
-                    bool isDetailExist = false;
+              //Cek username, nop, bulan and tahun is exist
+              bool isDetailExist = false;
               try
               {
-                      //todo delete 1 row below List<UserTransactionDetail> lstDetail = UserTransactionDetailBusiness.RetrieveUserDetailTransactionByDateTransaction(nop, tglTrans).ToList();
-                      List<UserTransactionDetail> lstDetail = null;
-                if (lstDetail != null && lstDetail.Count > 0)
+                //todo delete 1 row below List<UserTransactionDetail> lstDetail = UserTransactionDetailBusiness.RetrieveUserDetailTransactionByDateTransaction(nop, tglTrans).ToList();
+                List<UserTransactionDetail> lstDetail = null;
+                if( lstDetail != null && lstDetail.Count > 0 )
                   isDetailExist = true;
 
-                      //Delete if username, nop, bulan and tahun is exist
-                      if (isDetailExist)
-                  _userTransactionDetailBusiness.DeleteUserDetailTransaction(nop, tglTrans);
+                //Delete if username, nop, bulan and tahun is exist
+                if( isDetailExist )
+                  _userTransactionDetailBusiness.DeleteUserDetailTransaction( nop, tglTrans );
 
-                      // insert Trasaction Detail
-                      _userTransactionDetailBusiness.InsertUserTransactionDetail(username, dir, bulan.AsInt32(), tahun.AsInt32(), tglTrans, ip, xmlString, nop);
+                // insert Trasaction Detail
+                _userTransactionDetailBusiness.InsertUserTransactionDetail( username, dir, bulan.AsInt32(), tahun.AsInt32(), tglTrans, ip, xmlString, nop );
               }
-              catch (Exception ex)
+              catch( Exception ex )
               {
-                return Response.AsJson(new { code = HttpStatusCode.MethodNotAllowed, message = "Insert trasanction detail gagal, " + ex.Message });
+                return Response.AsJson( new { code = HttpStatusCode.MethodNotAllowed, message = "Insert trasanction detail gagal, " + ex.Message } );
               }
             }
           }
 
-          log.Info("End : /dev/postTransactionClient");
-          if (lstNopBlokir != null && lstNopBlokir.Count > 0)
+          log.Info( "End : /dev/postTransactionClient" );
+          if( lstNopBlokir != null && lstNopBlokir.Count > 0 )
           {
             string nopBlokir = string.Empty;
-            foreach (var itemBlokir in lstNopBlokir)
+            foreach( var itemBlokir in lstNopBlokir )
             {
               nopBlokir += itemBlokir + ",";
             }
 
-            nopBlokir = nopBlokir.Remove(nopBlokir.Length - 1);
+            nopBlokir = nopBlokir.Remove( nopBlokir.Length - 1 );
 
-            return Response.AsJson(new { code = HttpStatusCode.MethodNotAllowed, message = "nop (" + nopBlokir + ") pada masapajak tersebut, sudah tergenerate." });
+            return Response.AsJson( new { code = HttpStatusCode.MethodNotAllowed, message = "nop (" + nopBlokir + ") pada masapajak tersebut, sudah tergenerate." } );
           }
           else
           {
             try
             {
-              var connection = SignalR.Utilities.ConnectionMap.GetConnectionMap(username);
-              if (connection.Value.IsRequesting)
+              var connection = SignalR.Utilities.ConnectionMap.GetConnectionMap( username );
+              if( connection.Value.IsRequesting )
               {
                 connection.Value.IsRequesting = false;
               }
@@ -718,49 +718,49 @@ namespace POProject.API.Module
             }
 
 
-            return Response.AsJson(new { code = HttpStatusCode.OK, message = "Transaksi berhasil tersimpan" });
+            return Response.AsJson( new { code = HttpStatusCode.OK, message = "Transaksi berhasil tersimpan" } );
           }
         }
-        catch (System.Exception ex)
+        catch( System.Exception ex )
         {
-          log.Fatal("Error: /dev/postTransactionClient", ex);
-          return Response.AsJson(new { code = HttpStatusCode.InternalServerError, message = $"Error, {ex.Message}" });
-                //throw;
-              }
+          log.Fatal( "Error: /dev/postTransactionClient", ex );
+          return Response.AsJson( new { code = HttpStatusCode.InternalServerError, message = $"Error, {ex.Message}" } );
+          //throw;
+        }
       };
 
       Post["/dev/postUserActivity"] = parameter =>
       {
         try
         {
-          log.Info("Start : /dev/postUserActivity");
+          log.Info( "Start : /dev/postUserActivity" );
           string ip = this.Request.UserHostAddress;
-          log.Info($"incoming request from IP:{ip}");
-          string body = Nancy.IO.RequestStream.FromStream(Request.Body).AsString();
+          log.Info( $"incoming request from IP:{ip}" );
+          string body = Nancy.IO.RequestStream.FromStream( Request.Body ).AsString();
 
-          log.Info("Deserializing Object ............");
-          UserActivity userActivity = JsonConvert.DeserializeObject<UserActivity>(body);
+          log.Info( "Deserializing Object ............" );
+          UserActivity userActivity = JsonConvert.DeserializeObject<UserActivity>( body );
           DateTime dateNow = DateTime.Now;
 
 
           DateTime tglClient = DateTime.MinValue;
           try
           {
-            tglClient = Convert.ToDateTime(userActivity.ActivityDate, new CultureInfo(userActivity.CultureInfos));
+            tglClient = Convert.ToDateTime( userActivity.ActivityDate, new CultureInfo( userActivity.CultureInfos ) );
           }
-          catch (Exception ex)
+          catch( Exception ex )
           {
-            log.Info("Date format error......" + ex.Message);
+            log.Info( "Date format error......" + ex.Message );
           }
 
-          tglClient = Convert.ToDateTime(tglClient, new CultureInfo("en-US"));
+          tglClient = Convert.ToDateTime( tglClient, new CultureInfo( "en-US" ) );
 
 
-          if (userActivity != null)
+          if( userActivity != null )
           {
-            log.Info("Inserting user activity ............");
+            log.Info( "Inserting user activity ............" );
             bool status = false;
-            if (string.Compare(userActivity.StatusError, "1") == 0)
+            if( string.Compare( userActivity.StatusError, "1" ) == 0 )
             {
               status = true;
             }
@@ -768,31 +768,31 @@ namespace POProject.API.Module
             try
             {
               string ipClient = userActivity.IPClient;
-              if (string.IsNullOrEmpty(userActivity.IPClient))
+              if( string.IsNullOrEmpty( userActivity.IPClient ) )
                 ipClient = ip;
 
-              _userActivityBusiness.InsertUserActivity(userActivity.Username, ipClient, dateNow, status, userActivity.Keterangan);
-              var jsonBody = JsonConvert.SerializeObject(dateNow, Formatting.None, new IsoDateTimeConverter() { DateTimeFormat = "yyyy-MM-dd hh:mm:ss" });
+              _userActivityBusiness.InsertUserActivity( userActivity.Username, ipClient, dateNow, status, userActivity.Keterangan );
+              var jsonBody = JsonConvert.SerializeObject( dateNow, Formatting.None, new IsoDateTimeConverter() { DateTimeFormat = "yyyy-MM-dd hh:mm:ss" } );
 
-              log.Info("End : /dev/postUserActivity");
-              return Response.AsJson(new { code = HttpStatusCode.OK, message = "User Activity Berhasil tersimpan.", body = jsonBody });
+              log.Info( "End : /dev/postUserActivity" );
+              return Response.AsJson( new { code = HttpStatusCode.OK, message = "User Activity Berhasil tersimpan.", body = jsonBody } );
             }
-            catch (Exception ex)
+            catch( Exception ex )
             {
-              log.Fatal("Error : /dev/postUserActivity", ex);
-              return Response.AsJson(new { code = HttpStatusCode.InternalServerError, message = $"Error, {ex.Message}" });
+              log.Fatal( "Error : /dev/postUserActivity", ex );
+              return Response.AsJson( new { code = HttpStatusCode.InternalServerError, message = $"Error, {ex.Message}" } );
             }
           }
           else
           {
-            log.Info("End : /dev/postUserActivity");
-            return Response.AsJson(new { code = HttpStatusCode.Unauthorized, message = "Failed while deserializing object, data not found", body = string.Empty });
+            log.Info( "End : /dev/postUserActivity" );
+            return Response.AsJson( new { code = HttpStatusCode.Unauthorized, message = "Failed while deserializing object, data not found", body = string.Empty } );
           }
         }
-        catch (Exception ex)
+        catch( Exception ex )
         {
-          log.Fatal("Error : /dev/postUserActivity", ex);
-          return Response.AsJson(new { code = HttpStatusCode.InternalServerError, message = $"Error, {ex.Message}" });
+          log.Fatal( "Error : /dev/postUserActivity", ex );
+          return Response.AsJson( new { code = HttpStatusCode.InternalServerError, message = $"Error, {ex.Message}" } );
         }
       };
 
@@ -800,35 +800,35 @@ namespace POProject.API.Module
       {
         try
         {
-          log.Info("Start : /dev/RetrieveCpuId");
+          log.Info( "Start : /dev/RetrieveCpuId" );
           string username = string.Empty;
           string cpuId = string.Empty;
-          string body = Nancy.IO.RequestStream.FromStream(Request.Body).AsString();
+          string body = Nancy.IO.RequestStream.FromStream( Request.Body ).AsString();
 
-          log.Info("Deserializing Object ............");
-          string[] arrStr = body.Split(',');
+          log.Info( "Deserializing Object ............" );
+          string[] arrStr = body.Split( ',' );
 
-          if (arrStr.Count() > 0)
+          if( arrStr.Count() > 0 )
           {
-            for (int iArr = 0; iArr < arrStr.Count(); iArr++)
+            for( int iArr = 0; iArr < arrStr.Count(); iArr++ )
             {
               username += "'" + arrStr[iArr] + "',";
             }
 
-            username = username.Remove(username.Length - 1);
+            username = username.Remove( username.Length - 1 );
           }
 
-          List<UserClient> lstUsr = _settingClientBusiness.RetrieveUserClient(username);
-          if (lstUsr != null && lstUsr.Count > 0)
+          List<UserClient> lstUsr = _settingClientBusiness.RetrieveUserClient( username );
+          if( lstUsr != null && lstUsr.Count > 0 )
             cpuId = lstUsr.FirstOrDefault().Id_Machine;
 
-          log.Info("End : /dev/RetrieveCpuId");
-          return Response.AsJson(new { code = HttpStatusCode.OK, message = "OK", cpuId = cpuId });
+          log.Info( "End : /dev/RetrieveCpuId" );
+          return Response.AsJson( new { code = HttpStatusCode.OK, message = "OK", cpuId = cpuId } );
         }
-        catch (Exception ex)
+        catch( Exception ex )
         {
-          log.Info("End : /dev/RetrieveCpuId");
-          return Response.AsJson(new { code = HttpStatusCode.FailedDependency, message = ex.Message, cpuId = "" });
+          log.Info( "End : /dev/RetrieveCpuId" );
+          return Response.AsJson( new { code = HttpStatusCode.FailedDependency, message = ex.Message, cpuId = "" } );
         }
       };
 
@@ -836,41 +836,41 @@ namespace POProject.API.Module
       {
         try
         {
-          log.Info("Start : /dev/RetrieveJatuhTempo");
+          log.Info( "Start : /dev/RetrieveJatuhTempo" );
           string ip = this.Request.UserHostAddress;
-          log.Info($"incoming request from IP:{ip}");
-          string body = Nancy.IO.RequestStream.FromStream(Request.Body).AsString();
+          log.Info( $"incoming request from IP:{ip}" );
+          string body = Nancy.IO.RequestStream.FromStream( Request.Body ).AsString();
 
-          log.Info("Deserializing Object ............");
-          RequestDueDate dueDate = JsonConvert.DeserializeObject<RequestDueDate>(body);
+          log.Info( "Deserializing Object ............" );
+          RequestDueDate dueDate = JsonConvert.DeserializeObject<RequestDueDate>( body );
 
           string tanggal = string.Empty;
-          if (dueDate != null)
+          if( dueDate != null )
           {
-            JatuhTempo jthTempo = _jatuhTempoBusiness.RetrieveJatuhTempo(dueDate.masapajak.AsInt32(), dueDate.tahunpajak.AsInt32());
-            if (jthTempo != null)
+            JatuhTempo jthTempo = _jatuhTempoBusiness.RetrieveJatuhTempo( dueDate.masapajak.AsInt32(), dueDate.tahunpajak.AsInt32() );
+            if( jthTempo != null )
             {
-              tanggal = jthTempo.Tgl_Jatuh_Tempo.ToString("dd/MM/yyyy");
+              tanggal = jthTempo.Tgl_Jatuh_Tempo.ToString( "dd/MM/yyyy" );
 
-              log.Info("End : /dev/RetrieveJatuhTempo");
-              return Response.AsJson(new { code = HttpStatusCode.OK, tanggal = tanggal });
+              log.Info( "End : /dev/RetrieveJatuhTempo" );
+              return Response.AsJson( new { code = HttpStatusCode.OK, tanggal = tanggal } );
             }
             else
             {
-              log.Info("End : /dev/RetrieveJatuhTempo");
-              return Response.AsJson(new { code = HttpStatusCode.ExpectationFailed });
+              log.Info( "End : /dev/RetrieveJatuhTempo" );
+              return Response.AsJson( new { code = HttpStatusCode.ExpectationFailed } );
             }
           }
           else
           {
-            log.Info("End : /dev/RetrieveJatuhTempo");
-            return Response.AsJson(new { code = HttpStatusCode.Unauthorized, message = "Failed while deserializing object, data not found", body = string.Empty });
+            log.Info( "End : /dev/RetrieveJatuhTempo" );
+            return Response.AsJson( new { code = HttpStatusCode.Unauthorized, message = "Failed while deserializing object, data not found", body = string.Empty } );
           }
         }
-        catch (Exception ex)
+        catch( Exception ex )
         {
-          log.Fatal("Error : /dev/RetrieveJatuhTempo", ex);
-          return Response.AsJson(new { code = HttpStatusCode.InternalServerError, message = $"Error, {ex.Message}" });
+          log.Fatal( "Error : /dev/RetrieveJatuhTempo", ex );
+          return Response.AsJson( new { code = HttpStatusCode.InternalServerError, message = $"Error, {ex.Message}" } );
         }
       };
     }

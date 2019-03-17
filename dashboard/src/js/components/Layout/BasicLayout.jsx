@@ -5,28 +5,11 @@ import { Route } from "react-router-dom";
 import SideMenu from '../SideMenu';
 import LoginPage from '../LoginPage';
 import DashboardHeader from '../DashboardHeader';
-import DashboardPage from '../DashboardPage';
-import ProfilePage from '../ProfilePage';
-import InformationPage from '../InformationPage';
-import AdjustmentPage from '../AdjustmentPage';
-import GeneratePaymentPage from '../GeneratePaymentPage';
-import PrivateRoute from '../PrivateRoute';
+import { Routes } from '../../constants/routes';
 
 import './index.css';
 
 const { Header, Content, Footer, Sider } = Layout;
-
-// const fakeAuth = {
-//   isAuthenticated: false,
-//   authenticate(cb) {
-//       this.isAuthenticated = true;
-//       setTimeout(cb, 100)
-//   },
-//   signout(cb) {
-//       this.isAuthenticated = false;
-//       setTimeout(cb, 100)
-//   }
-// }
 
 export default class BasicLayout extends React.Component {
   state = {
@@ -41,7 +24,7 @@ export default class BasicLayout extends React.Component {
         {...this.props}
       />
     )
-  }  
+  }
 
   onCollapse = (collapsed) => {
     this.setState({ collapsed });
@@ -80,11 +63,11 @@ export default class BasicLayout extends React.Component {
             </Breadcrumb>
             <div style={{ padding: 24, background: '#fff', minHeight: 360 }}>
               <Route exact path="/login" component={this.LoginPageWithProps} />
-              <Route exact path="/" component={DashboardPage} />
-              <Route exact path="/profile" component={ProfilePage} />
-              <Route exact path="/information" component={InformationPage} />
-              <PrivateRoute authed={this.props.appState.login.username !== ''} path="/adjustment" component={AdjustmentPage} />
-              <Route exact path="/generate-payment" component={GeneratePaymentPage} />
+              {
+                Routes.map((route, id) => {
+                  return <Route exact {...route} key={`route${id}`}/>
+                })
+              }
             </div>
           </Content>
         </Layout>

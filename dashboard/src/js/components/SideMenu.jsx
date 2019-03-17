@@ -28,12 +28,6 @@ export default class SideMenu extends React.Component {
                         <span>Profil</span>
                     </Link>
                 </Menu.Item>
-                {/* <Menu.Item key="3">
-                    <Link to='/information'>
-                        <Icon type="info-circle" />
-                        <span>Hasil Perekaman</span>
-                    </Link>
-                </Menu.Item> */}
                 <Menu.Item key="4">
                     <Link to='/adjustment'>
                         <Icon type="desktop" />

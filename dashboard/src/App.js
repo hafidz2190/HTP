@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { BrowserRouter } from 'react-router-dom'
 import BasicLayout from './js/components/Layout/BasicLayout';
-// import logo from './logo.svg';
 import './App.css';
 import 'antd/dist/antd.css';
 
